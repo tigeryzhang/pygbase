@@ -90,5 +90,6 @@ class ECS:
 		if not component_entities:
 			del self._component_entities[component_type]
 
-	def query(self, query: Query) -> list[tuple[Entity, Component, ...]]:
+	def query(self, query: Query) -> list[tuple[Entity, *tuple[Component, ...]]]:
+		# TODO
 		pass
