@@ -30,3 +30,6 @@ module-root = ""
 dev = [
     "pytest>=8.4.2",
 ]
+
+[tool.ruff.lint]
+ignore = ["RUF012"]

@@ -56,11 +56,12 @@ def test_make_custom_entity():
 	assert entity.id in ecs._component_entities[CustomComponent]
 
 	custom_component = ecs.get_component(entity, CustomComponent)
+	assert custom_component is not None
 	assert custom_component.int_data == 1
 	assert custom_component.str_data == "test"
 
 	custom_component.int_data = 10
-	assert ecs.get_component(entity, CustomComponent).int_data == 10
+	assert ecs.component(entity, CustomComponent).int_data == 10
 
 
 def test_make_and_delete_entity_with_components():
@@ -102,22 +103,22 @@ def test_make_entity_with_component_overrides():
 	ecs = ECS()
 	entity = ecs.create_entity(CustomEntity)
 
-	assert ecs.get_component(entity, CustomComponent).int_data == 1
-	assert ecs.get_component(entity, CustomComponent).str_data == "test"
+	assert ecs.component(entity, CustomComponent).int_data == 1
+	assert ecs.component(entity, CustomComponent).str_data == "test"
 
 	entity_with_override = ecs.create_entity(
 		CustomEntity, {CustomComponent: (10, "test2"), CustomComponent2: ((50, 50),)}
 	)
-	assert ecs.get_component(entity_with_override, CustomComponent).int_data == 10
-	assert ecs.get_component(entity_with_override, CustomComponent).str_data == "test2"
+	assert ecs.component(entity_with_override, CustomComponent).int_data == 10
+	assert ecs.component(entity_with_override, CustomComponent).str_data == "test2"
 
-	assert ecs.get_component(entity_with_override, CustomComponent2).pos == pygame.Vector2(50, 50)
+	assert ecs.component(entity_with_override, CustomComponent2).pos == pygame.Vector2(50, 50)
 
 	entity_with_custom2 = ecs.create_entity(CustomEntity, {CustomComponent2: ((10, 10),)})
-	assert ecs.get_component(entity_with_custom2, CustomComponent).int_data == 1
-	assert ecs.get_component(entity_with_custom2, CustomComponent).str_data == "test"
+	assert ecs.component(entity_with_custom2, CustomComponent).int_data == 1
+	assert ecs.component(entity_with_custom2, CustomComponent).str_data == "test"
 
-	assert ecs.get_component(entity_with_custom2, CustomComponent2).pos == pygame.Vector2(10, 10)
+	assert ecs.component(entity_with_custom2, CustomComponent2).pos == pygame.Vector2(10, 10)
 
 
 def test_add_delete_components():

@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Any, cast, overload
 
 from .component import Component
 from .entity import Entity
@@ -12,9 +13,21 @@ class ECS:
 		self._components: dict[type[Component], dict[int, Component]] = {}
 		self._component_entities: dict[type[Component], set[int]] = defaultdict(set)
 
+	@overload
+	def create_entity(
+		self, *, components: dict[type[Component], tuple] | None = None
+	) -> Entity: ...
+
+	@overload
 	def create_entity[T: Entity](
-		self, base: type[T] = Entity, components: dict[type[Component], tuple[...]] | None = None
-	) -> T:
+		self, base: type[T], components: dict[type[Component], tuple[Any, ...]] | None = None
+	) -> T: ...
+
+	def create_entity(
+		self,
+		base: type[Entity] = Entity,
+		components: dict[type[Component], tuple[Any, ...]] | None = None,
+	) -> Entity:
 		"""
 		:param base: Base class of entity to spawn
 		:param components: Components entity should spawn with (overrides default components)
@@ -54,7 +67,8 @@ class ECS:
 				if not components:
 					del self._components[component_type]
 
-			component_entities = self._component_entities.get(component_type)
+			# Exists from earlier check
+			component_entities = self._component_entities[component_type]
 			component_entities.discard(entity.id)
 			if not component_entities:
 				del self._component_entities[component_type]
@@ -68,9 +82,15 @@ class ECS:
 	def get_component[T: Component](self, entity: Entity, component_type: type[T]) -> T | None:
 		components = self._components.get(component_type)
 		if components is not None:
-			return components.get(entity.id)
+			return cast(T | None, components.get(entity.id))
 
 		return None
+
+	def component[T: Component](self, entity: Entity, component_type: type[T]) -> T:
+		component = self.get_component(entity, component_type)
+		if component is None:
+			raise KeyError(f"{entity} does not have a {component_type.__name__}")
+		return component
 
 	def remove_component[T: Component](self, entity: Entity, component_type: type[T]):
 		component_types = self._entity_components.get(entity.id)
@@ -85,11 +105,12 @@ class ECS:
 			if not components:
 				del self._components[component_type]
 
-		component_entities = self._component_entities.get(component_type)
+		# Exists from earlier check
+		component_entities = self._component_entities[component_type]
 		component_entities.discard(entity.id)
 		if not component_entities:
 			del self._component_entities[component_type]
 
-	def query(self, query: Query) -> list[tuple[Entity, *tuple[Component, ...]]]:
+	def query(self, query: Query) -> list[tuple[Entity, *tuple[Component, ...]]]:  # ty: ignore[empty-body]
 		# TODO
 		pass
