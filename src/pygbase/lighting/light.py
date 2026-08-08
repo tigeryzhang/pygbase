@@ -10,14 +10,14 @@ class Light:
 	cached_lights: list[pygame.Surface] = []
 
 	def __init__(
-			self,
-			pos: pygame.typing.Point,
-			brightness: float,
-			radius: float,
-			variation: float,
-			variation_speed: float,
-			camera_affected: bool = True,
-			tint=(255, 255, 255),
+		self,
+		pos: pygame.typing.Point,
+		brightness: float,
+		radius: float,
+		variation: float,
+		variation_speed: float,
+		camera_affected: bool = True,
+		tint=(255, 255, 255),
 	):
 		self.start_time = pygame.time.get_ticks() / 1000
 
@@ -37,15 +37,23 @@ class Light:
 		self.variation_speed = variation_speed
 
 		self.brightness_surface = pygame.Surface(
-			((self.radius + self.variation) * 2, (self.radius + self.variation) * 2), flags=pygame.SRCALPHA
+			((self.radius + self.variation) * 2, (self.radius + self.variation) * 2),
+			flags=pygame.SRCALPHA,
 		)
 		self.brightness_surface.fill(
-			(int(255 * self.brightness), int(255 * self.brightness), int(255 * self.brightness))
+			(
+				int(255 * self.brightness),
+				int(255 * self.brightness),
+				int(255 * self.brightness),
+			)
 		)
 
 		if self.add_brightness > 0:
 			self.add_brightness_surface = pygame.Surface(
-				((self.radius + self.variation) * 2, (self.radius + self.variation) * 2),
+				(
+					(self.radius + self.variation) * 2,
+					(self.radius + self.variation) * 2,
+				),
 				flags=pygame.SRCALPHA,
 			)
 			self.add_brightness_surface.fill(
@@ -58,7 +66,8 @@ class Light:
 
 		self.tint = tint
 		self.tint_surface = pygame.Surface(
-			((self.radius + self.variation) * 2, (self.radius + self.variation) * 2), flags=pygame.SRCALPHA
+			((self.radius + self.variation) * 2, (self.radius + self.variation) * 2),
+			flags=pygame.SRCALPHA,
 		)
 		self.tint_surface.fill(self.tint)
 
@@ -77,7 +86,11 @@ class Light:
 		self.add_brightness = pygame.math.clamp(brightness - 1, 0, 1)
 
 		self.brightness_surface.fill(
-			(int(255 * self.brightness), int(255 * self.brightness), int(255 * self.brightness))
+			(
+				int(255 * self.brightness),
+				int(255 * self.brightness),
+				int(255 * self.brightness),
+			)
 		)
 
 		if self.add_brightness > 0:
@@ -126,7 +139,9 @@ class Light:
 
 		else:
 			surface.blit(
-				light_surface, light_surface.get_rect(center=self.pos), special_flags=pygame.BLEND_ADD
+				light_surface,
+				light_surface.get_rect(center=self.pos),
+				special_flags=pygame.BLEND_ADD,
 			)
 
 			if self.add_brightness > 0:

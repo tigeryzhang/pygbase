@@ -17,9 +17,7 @@ class DialogueTesting(pygbase.GameState, name="dialogue"):
 			pygbase.DialogueNode("second", "The first one must have worked, what about this?")
 		).add_option(
 			"second",
-			pygbase.DialogueOption(
-				"Back", callback=self.set_next_state_type, callback_args=(Menu, ())
-			),
+			pygbase.DialogueOption("Back", callback=self.set_next_state_type, callback_args=(Menu, ())),
 		)
 
 	def update(self, delta: float):

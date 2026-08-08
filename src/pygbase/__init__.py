@@ -20,22 +20,22 @@ from .resources import Resources, ResourceType
 from .timer import Timer
 from .transition_states import FadeTransition
 from .tweens import CubicTween, LinearTween
-from .ui.dialogue import DialogueOption, DialogueManager, DialogueNode
+from .ui.dialogue import DialogueManager, DialogueNode, DialogueOption
 
 __all__ = [
 	"App",
 	"Camera",
 	"CameraController",
-	"GameState",
-	"Timer",
-	"FadeTransition",
-	"LinearTween",
 	"CubicTween",
-	"Resources",
-	"ResourceType",
-	"DialogueOption",
 	"DialogueManager",
 	"DialogueNode",
+	"DialogueOption",
+	"FadeTransition",
+	"GameState",
+	"LinearTween",
+	"ResourceType",
+	"Resources",
+	"Timer",
 ]
 
 
@@ -61,9 +61,7 @@ def init(
 	Events.init()
 	Input.register_handlers()
 
-	lighting.init_lighting_system(
-		max_light_radius, max_shadow_radius, light_radius_interval, shadow_ratio
-	)
+	lighting.init_lighting_system(max_light_radius, max_shadow_radius, light_radius_interval, shadow_ratio)
 
 	Debug.init()
 
@@ -118,7 +116,8 @@ def add_sound_resource(name: str, type_id: int, dir_path: str, sound_ending: str
 		return sound
 
 	add_resource_type(
-		type_id, ResourceType(name, dir_path, sound_ending, {"volume": 1}, None, load_sound)
+		type_id,
+		ResourceType(name, dir_path, sound_ending, {"volume": 1}, None, load_sound),
 	)
 
 
@@ -132,10 +131,8 @@ def add_particle_setting(
 	effector: bool,
 	bounce: tuple[tuple[float, float], tuple[float, float]],
 ):
-	Common.add_particle_setting(
-		name, colour, size, size_decay, velocity_decay, gravity, effector, bounce
-	)
+	Common.add_particle_setting(name, colour, size, size_decay, velocity_decay, gravity, effector, bounce)
 
 
-def quit():  # NoQA
+def quit():
 	pygame.quit()

@@ -1,6 +1,6 @@
 import gc
 import logging
-from typing import Type, Union, Callable
+from collections.abc import Callable
 
 import pygame
 
@@ -15,11 +15,11 @@ from .particles.particle import Particle
 
 class App:
 	def __init__(
-			self,
-			after_load_state: Type[GameState],
-			title: str = "Pygbase Window",
-			fixed_time_fps: int = 60,
-			run_on_load_complete: tuple[Callable, ...] = ()
+		self,
+		after_load_state: type[GameState],
+		title: str = "Pygbase Window",
+		fixed_time_fps: int = 60,
+		run_on_load_complete: tuple[Callable, ...] = (),
 	):
 		self.is_running: bool = True
 
@@ -34,7 +34,7 @@ class App:
 		Common.set("screen", self.screen)
 
 		load_complete_runners = (Particle.cache_particle_images,) + run_on_load_complete
-		self.game_state: Union[Loading, GameState] = Loading(after_load_state, load_complete_runners)
+		self.game_state: Loading | GameState = Loading(after_load_state, load_complete_runners)
 
 		self.fixed_time_rate = 1 / fixed_time_fps
 

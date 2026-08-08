@@ -2,12 +2,12 @@ from collections.abc import Callable
 
 import pygame
 
-from .ui_element import Frame
-from .ui_elements import Button, Image, Text
-from .values import YAlign, Padding, Grow, Layout, XAlign, Fit
 from ..common import Common
 from ..timer import Timer
 from .rawtext import RawText
+from .ui_element import Frame
+from .ui_elements import Button, Image, Text
+from .values import Fit, Grow, Layout, Padding, XAlign, YAlign
 
 
 class DialogueNode:
@@ -29,16 +29,23 @@ class DialogueNode:
 		self.texts.clear()
 
 		for word in self.words:
-			self.texts.append(RawText((starting_x, starting_y), "arial", 30, "white", text=word, use_sys=True))
+			self.texts.append(
+				RawText(
+					(starting_x, starting_y),
+					"arial",
+					30,
+					"white",
+					text=word,
+					use_sys=True,
+				)
+			)
 
 		# Position words
 		for index in range(1, len(self.texts)):
 			current_text = self.texts[index]
 			previous_text = self.texts[index - 1]
 
-			current_text.pos.update(
-				previous_text.text_rect.right + word_gap, previous_text.text_rect.top
-			)
+			current_text.pos.update(previous_text.text_rect.right + word_gap, previous_text.text_rect.top)
 			current_text.reposition()
 
 			if current_text.text_rect.right > width:
@@ -67,9 +74,7 @@ class DialogueNode:
 				self.just_finished_displaying = True
 				return
 
-			self.texts[self.current_word].set_text(
-				self.words[self.current_word][: self.current_char]
-			)
+			self.texts[self.current_word].set_text(self.words[self.current_word][: self.current_char])
 		else:
 			self.just_finished_displaying = False
 
@@ -80,11 +85,11 @@ class DialogueNode:
 
 class DialogueOption:
 	def __init__(
-			self,
-			response: str,
-			next_node: str = "",
-			callback: Callable[..., None] | None = None,
-			callback_args: tuple = (),
+		self,
+		response: str,
+		next_node: str = "",
+		callback: Callable[..., None] | None = None,
+		callback_args: tuple = (),
 	):
 		self.response = response
 		self.next_node = next_node
@@ -127,7 +132,11 @@ class DialogueManager:
 			with Frame(size=(Grow(), Grow()), padding=Padding.all(6), bg_color=(20, 20, 20, 50)):
 				text_frame = Frame(size=(Grow(4), Grow()))
 
-				with Frame(size=(Grow(), Grow()), layout=Layout.TOP_TO_BOTTOM, bg_color=(50, 50, 50, 100)):  # Option Frame
+				with Frame(
+					size=(Grow(), Grow()),
+					layout=Layout.TOP_TO_BOTTOM,
+					bg_color=(50, 50, 50, 100),
+				):  # Option Frame
 					self._generate_options()
 
 		ui.resolve_layout(Common.get("screen_size"))
@@ -156,15 +165,15 @@ class DialogueManager:
 		else:
 			for option in self.get_options():
 				with Button(
-						self.option_callback,
-						callback_args=(option,),
-						size=(Grow(), Fit()),
+					self.option_callback,
+					callback_args=(option,),
+					size=(Grow(), Fit()),
 				):
 					with Image(
-							image=self.button_path,
-							size=(Grow(), Fit()),
-							x_align=XAlign.CENTER,
-							y_align=YAlign.CENTER,
+						image=self.button_path,
+						size=(Grow(), Fit()),
+						x_align=XAlign.CENTER,
+						y_align=YAlign.CENTER,
 					):
 						Text(option.response, 30, "white")
 
@@ -180,11 +189,11 @@ class DialogueManager:
 
 		return self.options[self.current_node]
 
-	def add_node(self, node: DialogueNode) -> "DialogueManager":
+	def add_node(self, node: DialogueNode) -> DialogueManager:
 		self.nodes[node.name] = node
 		return self
 
-	def add_option(self, node_name: str, option: DialogueOption) -> "DialogueManager":
+	def add_option(self, node_name: str, option: DialogueOption) -> DialogueManager:
 		if node_name not in self.options:
 			self.options[node_name] = []
 

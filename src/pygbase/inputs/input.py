@@ -60,9 +60,7 @@ class Input:
 	@classmethod
 	def bind_axis(cls, name: str, neg_key: str, pos_key: str):
 		if cls._keybind_is_joystick(neg_key) or cls._keybind_is_joystick(pos_key):
-			raise ValueError(
-				"`bind_axis` does not support joystick input, use `bind_axis_to_joystick` instead"
-			)
+			raise ValueError("`bind_axis` does not support joystick input, use `bind_axis_to_joystick` instead")
 
 		cls._keybind_axes[name] = (neg_key, pos_key)
 
@@ -75,7 +73,7 @@ class Input:
 
 	@staticmethod
 	def _get_input_type_from_input(
-			user_input: MouseInput | ControllerInput | int | str,
+		user_input: MouseInput | ControllerInput | int | str,
 	) -> InputTypes:
 		# Check for mouse
 		if isinstance(user_input, MouseInput):

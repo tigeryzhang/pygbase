@@ -1,7 +1,7 @@
 import pygame
 
-from .image import Image
 from ..camera import Camera
+from .image import Image
 
 
 class SpriteSheet:
@@ -17,7 +17,10 @@ class SpriteSheet:
 		# Load Sprite Sheet
 		self.image: pygame.Surface = pygame.image.load(resource_path).convert_alpha()
 		self.image.set_colorkey((0, 0, 0))
-		self.image = pygame.transform.scale(self.image, (self.image.get_width() * self.scale, self.image.get_height() * self.scale))
+		self.image = pygame.transform.scale(
+			self.image,
+			(self.image.get_width() * self.scale, self.image.get_height() * self.scale),
+		)
 
 		# Automatically set n_rows and n_cols if needed
 		if self.n_rows == 0:
@@ -32,7 +35,12 @@ class SpriteSheet:
 		self.length = len(self._images)
 
 	def _load_image(self, row, col):
-		rect = pygame.Rect(col * self.tile_width, row * self.tile_height, self.tile_width, self.tile_height)
+		rect = pygame.Rect(
+			col * self.tile_width,
+			row * self.tile_height,
+			self.tile_width,
+			self.tile_height,
+		)
 		# image = self.image.subsurface(rect)  # Unusable due to transparency issue
 		# image = pygame.Surface(rect.size, flags=pygame.SRCALPHA)
 		# image.blit(self.image, (0, 0), rect)
@@ -51,7 +59,7 @@ class SpriteSheet:
 
 	def draw_sheet(self, display: pygame.Surface, camera: Camera):
 		display.blit(self.image, -camera.pos)
-		#
+
 	# # TODO: Fix
 	# text = RawText((0, 0), "arial", 100, "white", use_sys=True)
 	# for row in range(self.n_rows):

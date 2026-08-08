@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 import pygame
 
@@ -30,7 +30,12 @@ class Events:
 			raise TypeError("Event must be of type int or str")
 
 	@classmethod
-	def add_handler(cls, state_name: str, event: int | str, handler: Callable[[pygame.event.Event], None]):
+	def add_handler(
+		cls,
+		state_name: str,
+		event: int | str,
+		handler: Callable[[pygame.event.Event], None],
+	):
 		game_state_id = Common.get_game_state_id(state_name)
 
 		if game_state_id not in cls._handlers:
@@ -44,7 +49,12 @@ class Events:
 		cls._handlers[game_state_id][event_type].append(handler)
 
 	@classmethod
-	def remove_handler(cls, handler: Callable[[pygame.event.Event], None], state_name: str | None = None, event: int | str | None = None):
+	def remove_handler(
+		cls,
+		handler: Callable[[pygame.event.Event], None],
+		state_name: str | None = None,
+		event: int | str | None = None,
+	):
 		if state_name is not None:
 			game_state_id = Common.get_game_state_id(state_name)
 

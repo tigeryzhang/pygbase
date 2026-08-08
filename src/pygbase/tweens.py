@@ -61,7 +61,7 @@ class CubicTween(Tween):
 	@staticmethod
 	def _cubic_ease(progress) -> float:
 		if progress < 0.5:
-			return 4 * (progress ** 3)
+			return 4 * (progress**3)
 		else:
 			return 1 - pow(-2 * progress + 2, 3) / 2
 

@@ -5,7 +5,7 @@ from .game_state import GameState
 
 
 class Transition(GameState, name="transition"):
-	def __init__(self, current_state: GameState, to_state: GameState):  # NoQA
+	def __init__(self, current_state: GameState, to_state: GameState):
 		self.id = -2
 		self._next_state = self
 
@@ -20,7 +20,13 @@ class Transition(GameState, name="transition"):
 
 
 class FadeTransition(Transition, name="fade_transition"):
-	def __init__(self, current_state: GameState, to_state: GameState, transition_time: float, fade_colour: tuple[int, int, int]):
+	def __init__(
+		self,
+		current_state: GameState,
+		to_state: GameState,
+		transition_time: float,
+		fade_colour: tuple[int, int, int],
+	):
 		super().__init__(current_state, to_state)
 
 		self.transition_time = transition_time
@@ -32,7 +38,7 @@ class FadeTransition(Transition, name="fade_transition"):
 
 		self.fade_surface = pygame.Surface(
 			(Common.get("screen_width"), Common.get("screen_height")),
-			flags=pygame.SRCALPHA
+			flags=pygame.SRCALPHA,
 		)
 
 	def update(self, delta: float):

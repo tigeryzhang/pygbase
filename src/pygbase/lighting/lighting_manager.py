@@ -1,9 +1,9 @@
 import pygame
 
-from .light import Light
-from .shadow import Shadow
 from ..camera import Camera
 from ..common import Common
+from .light import Light
+from .shadow import Shadow
 
 
 class LightingManager:
@@ -12,9 +12,18 @@ class LightingManager:
 		self.shadow_brightness = shadow_brightness
 
 		self.lighting_surf = pygame.Surface((Common.get("screen_width"), Common.get("screen_height")))
-		self.lighting_surf.fill((int(255 * default_brightness), int(255 * default_brightness), int(255 * default_brightness)))
+		self.lighting_surf.fill(
+			(
+				int(255 * default_brightness),
+				int(255 * default_brightness),
+				int(255 * default_brightness),
+			)
+		)
 
-		self.add_lighting_surf = pygame.Surface((Common.get("screen_width"), Common.get("screen_height")), flags=pygame.SRCALPHA)
+		self.add_lighting_surf = pygame.Surface(
+			(Common.get("screen_width"), Common.get("screen_height")),
+			flags=pygame.SRCALPHA,
+		)
 		self.add_lighting_surf.fill((0, 0, 0))
 
 		self.shadow_surf = pygame.Surface((Common.get("screen_width"), Common.get("screen_height")))

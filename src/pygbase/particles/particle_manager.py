@@ -86,13 +86,11 @@ class ParticleManager:
 		self.spawners.append(spawner)
 		return spawner
 
-	def remove_spawner(self, spawner: "ParticleSpawner"):
+	def remove_spawner(self, spawner: ParticleSpawner):
 		if spawner in self.spawners:
 			self.spawners.remove(spawner)
 
-	def add_affector[AffectorType](
-			self, affector_type: AffectorTypes, affector: AffectorType
-	) -> AffectorType:
+	def add_affector[AffectorType](self, affector_type: AffectorTypes, affector: AffectorType) -> AffectorType:
 		self.affectors[affector_type].append(affector)
 		return affector
 
@@ -167,9 +165,7 @@ class ParticleManager:
 
 			for affector_type, affectors in self.affectors.items():
 				for affector in affectors:
-					left_chunk_col, top_chunk_row = self.get_chunk(
-						affector.pos - pygame.Vector2(affector.radius)
-					)
+					left_chunk_col, top_chunk_row = self.get_chunk(affector.pos - pygame.Vector2(affector.radius))
 					(
 						right_chunk_col,
 						bottom_chunk_row,
@@ -179,7 +175,11 @@ class ParticleManager:
 
 					for row in range(top_chunk_row, bottom_chunk_row + 1):
 						for col in range(left_chunk_col, right_chunk_col + 1):
-							Debug.draw_circle(camera.world_to_screen(affector.pos), affector.radius, "yellow")
+							Debug.draw_circle(
+								camera.world_to_screen(affector.pos),
+								affector.radius,
+								"yellow",
+							)
 
 							Debug.draw_rect(
 								pygame.Rect(

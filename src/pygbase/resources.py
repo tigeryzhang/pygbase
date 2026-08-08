@@ -2,13 +2,22 @@ import json
 import logging
 import os
 from collections import deque
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from .common import Common
 
 
 class ResourceType:
-	def __init__(self, name: str, container_path: str, file_ending: str, default_data: dict, init_check: Optional[Callable[[dict], bool]], load_resource: Callable[[dict, str], Any]):
+	def __init__(
+		self,
+		name: str,
+		container_path: str,
+		file_ending: str,
+		default_data: dict,
+		init_check: Callable[[dict], bool] | None,
+		load_resource: Callable[[dict, str], Any],
+	):
 		self.name = name
 
 		self.container_path = container_path
@@ -66,7 +75,7 @@ class Resources:
 			for file_name in file_names:
 				if file_name.endswith(resource_type.file_ending):
 					file_path = os.path.join(dir_path, file_name)
-					name = file_name[:-len(resource_type.file_ending)]
+					name = file_name[: -len(resource_type.file_ending)]
 
 					resource_type.generate_config(config_path, file_name)
 
@@ -78,7 +87,9 @@ class Resources:
 		with open(config_path, "r") as config_file:
 			config_data: dict = json.load(config_file)
 
-		data = {key: value for key, value in config_data.items() if key in names}  # Make sure only available files are in config
+		data = {
+			key: value for key, value in config_data.items() if key in names
+		}  # Make sure only available files are in config
 
 		keys = list(data.keys())
 		keys.sort()
@@ -123,7 +134,9 @@ class Resources:
 						data = config_data[resource_name]
 
 					if resource_type.check_init(data):
-						cls._loaded_resources[resource_type_id][resource_name] = resource_type.load_resource(data, resource_path)
+						cls._loaded_resources[resource_type_id][resource_name] = resource_type.load_resource(
+							data, resource_path
+						)
 					else:
 						logging.warning(f"Skipping {resource_path}, uninitialized config")
 

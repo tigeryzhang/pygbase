@@ -1,4 +1,4 @@
 from .input import Input
-from .input_types import InputTypes, ControllerInput, MouseInput, ControllerTypes
+from .input_types import ControllerInput, ControllerTypes, InputTypes, MouseInput
 
-__all__ = ["Input", "InputTypes", "ControllerInput", "MouseInput", "ControllerTypes"]
+__all__ = ["ControllerInput", "ControllerTypes", "Input", "InputTypes", "MouseInput"]

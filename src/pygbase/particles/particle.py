@@ -6,22 +6,23 @@ import pygame
 from pygame import Surface
 
 from ..camera import Camera
-from ..common import ParticleOptions as Options, Common
+from ..common import Common
+from ..common import ParticleOptions as Options
 
 
 class Particle:
 	__slots__ = [
+		"bounce_ranges",
+		"cache",
+		"color",
+		"effector",
+		"gravity",
+		"has_moved_chunk",
 		"pos",
 		"size",
 		"size_decay",
-		"color",
 		"velocity",
 		"velocity_decay",
-		"gravity",
-		"effector",
-		"bounce_ranges",
-		"cache",
-		"has_moved_chunk",
 	]
 
 	PARTICLE_IMAGE_CACHE: dict[str, dict[pygame.typing.ColorLike, list[pygame.Surface]]] = {}
@@ -38,7 +39,7 @@ class Particle:
 
 			for color in colors:
 				cache[color] = []
-				for size in range(0, math.ceil(largest_size)):
+				for size in range(math.ceil(largest_size)):
 					surface = pygame.Surface((size, size))
 					surface.fill(color)
 					cache[color].append(surface)
@@ -49,9 +50,7 @@ class Particle:
 		self.pos = pygame.Vector2(pos)
 
 		self.size: float = random.uniform(settings[Options.SIZE][0], settings[Options.SIZE][1])
-		self.size_decay: float = random.uniform(
-			settings[Options.SIZE_DECAY][0], settings[Options.SIZE_DECAY][1]
-		)
+		self.size_decay: float = random.uniform(settings[Options.SIZE_DECAY][0], settings[Options.SIZE_DECAY][1])
 
 		self.color = random.choice(settings[Options.COLOR])
 

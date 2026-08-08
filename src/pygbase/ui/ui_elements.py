@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 import pygame
 
@@ -27,7 +27,16 @@ class Text(Frame):
 		blocks_mouse: bool = False,
 	):
 		super().__init__(
-			pos, size, layout, padding, gap, x_align, y_align, bg_color, can_interact, blocks_mouse
+			pos,
+			size,
+			layout,
+			padding,
+			gap,
+			x_align,
+			y_align,
+			bg_color,
+			can_interact,
+			blocks_mouse,
 		)
 
 		self._text = text
@@ -56,9 +65,7 @@ class Text(Frame):
 		self.dirty = True
 
 	def _wrap_text(self):
-		self._text_surface = self.font.render(
-			self._text, True, self.color, wraplength=int(self.size.x)
-		)
+		self._text_surface = self.font.render(self._text, True, self.color, wraplength=int(self.size.x))
 		self.min_height = self._text_surface.height
 
 		super()._wrap_text()
@@ -91,7 +98,16 @@ class Image(Frame):
 		"""
 
 		super().__init__(
-			pos, size, layout, padding, gap, x_align, y_align, bg_color, can_interact, blocks_mouse
+			pos,
+			size,
+			layout,
+			padding,
+			gap,
+			x_align,
+			y_align,
+			bg_color,
+			can_interact,
+			blocks_mouse,
 		)
 
 		self.image = image
@@ -99,36 +115,30 @@ class Image(Frame):
 		if isinstance(image, str):
 			split_image = image.split("/")
 			if len(split_image) != 2:
-				raise ValueError(
-					f'Image: `{image}` should be in the form "resource_name/image_name"'
-				)
+				raise ValueError(f'Image: `{image}` should be in the form "resource_name/image_name"')
 
 			resource_name, image_name = split_image[0], split_image[1]
 
-			self._raw_image_surface: pygame.Surface = Resources.get_resource(
-				resource_name, image_name
-			).get_image()
+			self._raw_image_surface: pygame.Surface = Resources.get_resource(resource_name, image_name).get_image()
 
 			if self._raw_image_surface.get_height() == 0:
 				raise ValueError("Image height is zero; cannot compute aspect ratio.")
-			self._aspect_ratio = (
-				self._raw_image_surface.get_width() / self._raw_image_surface.get_height()
-			)
+			self._aspect_ratio = self._raw_image_surface.get_width() / self._raw_image_surface.get_height()
 
 			self._image_surface = self._raw_image_surface.copy()
 			self._size.update(
-				self._raw_image_surface.get_width(), self._raw_image_surface.get_height()
+				self._raw_image_surface.get_width(),
+				self._raw_image_surface.get_height(),
 			)
 		elif isinstance(image, pygame.Surface):
 			self._raw_image_surface: pygame.Surface = image
 
-			self._aspect_ratio = (
-				self._raw_image_surface.get_width() / self._raw_image_surface.get_height()
-			)
+			self._aspect_ratio = self._raw_image_surface.get_width() / self._raw_image_surface.get_height()
 
 			self._image_surface = self._raw_image_surface.copy()
 			self._size.update(
-				self._raw_image_surface.get_width(), self._raw_image_surface.get_height()
+				self._raw_image_surface.get_width(),
+				self._raw_image_surface.get_height(),
 			)
 		else:
 			raise ValueError(f"Type of image: `{type(image)}` is not str or Surface")
@@ -148,7 +158,9 @@ class Image(Frame):
 				# print("Fixed Y:", self.min_height, self.height, self._iter_min_size.y)
 
 				self._iter_min_size.y = pygame.math.clamp(
-					self.width / self._aspect_ratio, self._iter_min_size.y, self._max_size.y
+					self.width / self._aspect_ratio,
+					self._iter_min_size.y,
+					self._max_size.y,
 				)
 				self.min_height = self.min_height
 				self.height = max(self.height, self.min_height)
@@ -166,9 +178,7 @@ class Image(Frame):
 
 	def _draw_self(self, surface: pygame.Surface):
 		if self.image is not None and self.size != pygame.Vector2(self._image_surface.get_size()):
-			self._image_surface = pygame.transform.scale(
-				self._raw_image_surface, (int(self.width), int(self.height))
-			)
+			self._image_surface = pygame.transform.scale(self._raw_image_surface, (int(self.width), int(self.height)))
 		surface.blit(self._image_surface, self._draw_pos)
 
 
@@ -191,7 +201,16 @@ class Button(Frame):
 		blocks_mouse: bool = True,
 	):
 		super().__init__(
-			pos, size, layout, padding, gap, x_align, y_align, bg_color, can_interact, blocks_mouse
+			pos,
+			size,
+			layout,
+			padding,
+			gap,
+			x_align,
+			y_align,
+			bg_color,
+			can_interact,
+			blocks_mouse,
 		)
 
 		self.add_action(UIActionTriggers.ON_CLICK_UP, callback, action_args=callback_args)
@@ -223,7 +242,16 @@ class TextSelector(Frame):
 		blocks_mouse: bool = False,
 	):
 		super().__init__(
-			pos, size, layout, padding, gap, x_align, y_align, bg_color, can_interact, blocks_mouse
+			pos,
+			size,
+			layout,
+			padding,
+			gap,
+			x_align,
+			y_align,
+			bg_color,
+			can_interact,
+			blocks_mouse,
 		)
 
 		self.index = 0
@@ -273,7 +301,16 @@ class ProgressBar(Frame):
 		blocks_mouse: bool = False,
 	):
 		super().__init__(
-			pos, size, layout, padding, gap, x_align, y_align, bg_color, can_interact, blocks_mouse
+			pos,
+			size,
+			layout,
+			padding,
+			gap,
+			x_align,
+			y_align,
+			bg_color,
+			can_interact,
+			blocks_mouse,
 		)
 
 		self._fill_percent = starting_fill

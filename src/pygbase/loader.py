@@ -1,4 +1,4 @@
-from typing import Type, Callable
+from collections.abc import Callable
 
 import pygame
 
@@ -7,7 +7,11 @@ from .resources import Resources
 
 
 class Loading(GameState, name="loading"):
-	def __init__(self, after_load_state: Type[GameState], run_on_load_complete: tuple[Callable, ...]):  # noqa
+	def __init__(
+		self,
+		after_load_state: type[GameState],
+		run_on_load_complete: tuple[Callable, ...],
+	):
 		# From GameState, but no parent __init__ call, so have to do it manually
 		self.id = -1
 		self._next_state = self

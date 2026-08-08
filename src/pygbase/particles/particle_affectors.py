@@ -36,7 +36,7 @@ class ParticleAttractor:
 		direction_vector = self.pos - pos
 		return direction_vector.normalize(), direction_vector.length()
 
-	def affect_particles(self, delta: float, particles: list["Particle"]):
+	def affect_particles(self, delta: float, particles: list[Particle]):
 		"""Will run when active"""
 
 		for particle in particles:

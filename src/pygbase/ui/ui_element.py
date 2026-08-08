@@ -1,13 +1,23 @@
 import logging
 from collections import deque
+from collections.abc import Callable
 from types import TracebackType
-from typing import Self, Type, Any, Callable
+from typing import Any, Self
 
 import pygame
 
+from .. import Common, Input
 from ..debug import Debug
-from .values import Fit, Layout, Grow, Padding, XAlign, YAlign, EPSILON, UIActionTriggers
-from .. import Input, Common
+from .values import (
+	EPSILON,
+	Fit,
+	Grow,
+	Layout,
+	Padding,
+	UIActionTriggers,
+	XAlign,
+	YAlign,
+)
 
 
 class Frame:
@@ -65,7 +75,7 @@ class Frame:
 
 		self.background_color = bg_color
 
-		self.children: list["Frame"] = []
+		self.children: list[Frame] = []
 
 		self.current_resolve_size = (0, 0)
 		self.dirty = True
@@ -169,7 +179,10 @@ class Frame:
 		return self
 
 	def __exit__(
-		self, exc_type: Type | None, exc_value: Any | None, traceback: TracebackType | None
+		self,
+		exc_type: type | None,
+		exc_value: Any | None,
+		traceback: TracebackType | None,
 	) -> bool:
 		if exc_type is not None:
 			logging.error(f"Exception raised {exc_value}")
@@ -323,7 +336,6 @@ class Frame:
 		# 	parent._iter_min_size.x,
 		# 	parent.min_width,
 		# )
-		pass
 
 	def _resolve_y_sizing(self):
 		# Bottom up pass (Post order DFS)
@@ -378,9 +390,7 @@ class Frame:
 		children_gap = (len(self.children) - 1) * self.child_gap
 
 		if self.direction == Layout.LEFT_TO_RIGHT:
-			grow_children = [
-				child for child in self.children if isinstance(child.size_settings[0], Grow)
-			]
+			grow_children = [child for child in self.children if isinstance(child.size_settings[0], Grow)]
 
 			# Subtract children and gaps
 			remaining_width -= sum(child.size.x for child in self.children) + children_gap
@@ -416,9 +426,7 @@ class Frame:
 					if ratio == min_ratio:
 						prev_width = child.width
 
-						width_to_add = min(
-							target_width, remaining_width / total_weight * child_weight
-						)
+						width_to_add = min(target_width, remaining_width / total_weight * child_weight)
 						child.width += width_to_add
 
 						if child.width > child._max_size.x:
@@ -447,14 +455,10 @@ class Frame:
 			for child in self.children:
 				if isinstance(child.size_settings[1], Grow):
 					child.height += remaining_height - child.height
-					child.height = pygame.math.clamp(
-						child.height, child.min_height, child._max_size.y
-					)
+					child.height = pygame.math.clamp(child.height, child.min_height, child._max_size.y)
 
 		if self.direction == Layout.TOP_TO_BOTTOM:
-			grow_children = [
-				child for child in self.children if isinstance(child.size_settings[1], Grow)
-			]
+			grow_children = [child for child in self.children if isinstance(child.size_settings[1], Grow)]
 
 			# Subtract children and gaps
 			remaining_height -= sum(child.size.y for child in self.children) + children_gap
@@ -491,7 +495,8 @@ class Frame:
 						prev_height = child.height
 
 						height_to_add = min(
-							target_height, remaining_height / total_weight * child_weight
+							target_height,
+							remaining_height / total_weight * child_weight,
 						)
 						child.height += height_to_add
 
@@ -509,9 +514,7 @@ class Frame:
 		children_gap = (len(self.children) - 1) * self.child_gap
 
 		if self.direction == Layout.LEFT_TO_RIGHT:
-			shrink_children = [
-				child for child in self.children if isinstance(child.size_settings[0], (Grow, Fit))
-			]
+			shrink_children = [child for child in self.children if isinstance(child.size_settings[0], (Grow, Fit))]
 
 			remaining_width -= sum(child.size.x for child in self.children) + children_gap
 
@@ -544,9 +547,7 @@ class Frame:
 						remaining_width -= child.width - prev_width  # remaining_width is negative
 
 		elif self.direction == Layout.TOP_TO_BOTTOM:
-			shrink_children = [
-				child for child in self.children if isinstance(child.size_settings[0], (Grow, Fit))
-			]
+			shrink_children = [child for child in self.children if isinstance(child.size_settings[0], (Grow, Fit))]
 
 			for child in shrink_children:
 				child.width = min(child.width, remaining_width)
@@ -560,18 +561,14 @@ class Frame:
 		children_gap = (len(self.children) - 1) * self.child_gap
 
 		if self.direction == Layout.LEFT_TO_RIGHT:
-			shrink_children = [
-				child for child in self.children if isinstance(child.size_settings[1], (Grow, Fit))
-			]
+			shrink_children = [child for child in self.children if isinstance(child.size_settings[1], (Grow, Fit))]
 
 			for child in shrink_children:
 				child.height = min(child.height, remaining_height)
 				child.height = pygame.math.clamp(child.height, child.min_height, child._max_size.y)
 
 		elif self.direction == Layout.TOP_TO_BOTTOM:
-			shrink_children = [
-				child for child in self.children if isinstance(child.size_settings[1], (Grow, Fit))
-			]
+			shrink_children = [child for child in self.children if isinstance(child.size_settings[1], (Grow, Fit))]
 
 			remaining_height -= sum(child.size.y for child in self.children) + children_gap
 
@@ -590,9 +587,7 @@ class Frame:
 						second_largest = max(second_largest, child.height)
 						height_to_subtract = second_largest - largest
 
-				height_to_subtract = max(
-					height_to_subtract, remaining_height / len(shrink_children)
-				)
+				height_to_subtract = max(height_to_subtract, remaining_height / len(shrink_children))
 
 				for child in shrink_children:
 					prev_height = child.height
@@ -603,9 +598,7 @@ class Frame:
 							child.height = child.min_height
 							shrink_children.remove(child)
 
-						remaining_height -= (
-							child.height - prev_height
-						)  # remaining_height is negative
+						remaining_height -= child.height - prev_height  # remaining_height is negative
 
 		for child in self.children:
 			child._shrink_children_y()
@@ -670,7 +663,10 @@ class Frame:
 			child._resolve_position()
 
 	def add_action(
-		self, trigger: UIActionTriggers, action: Callable[..., None], action_args: tuple = ()
+		self,
+		trigger: UIActionTriggers,
+		action: Callable[..., None],
+		action_args: tuple = (),
 	) -> Self:
 		self._actions[trigger].append((action, action_args))
 		return self
@@ -739,11 +735,9 @@ class Frame:
 
 	def _draw_self(self, surface: pygame.Surface):
 		"""Drawn on parent – used to draw self"""
-		pass
 
 	def _draw_overlay(self, surface: pygame.Surface):
 		"""Drawn on self – used to draw on top of self (and children)"""
-		pass
 
 	def draw(self, surface: pygame.Surface):
 		if self._surface is None or self.size != self._surface.size:

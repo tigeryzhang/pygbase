@@ -14,13 +14,13 @@ class ECS:
 		self._component_entities: dict[type[Component], set[int]] = defaultdict(set)
 
 	@overload
-	def create_entity(
-		self, *, components: dict[type[Component], tuple] | None = None
-	) -> Entity: ...
+	def create_entity(self, *, components: dict[type[Component], tuple] | None = None) -> Entity: ...
 
 	@overload
 	def create_entity[T: Entity](
-		self, base: type[T], components: dict[type[Component], tuple[Any, ...]] | None = None
+		self,
+		base: type[T],
+		components: dict[type[Component], tuple[Any, ...]] | None = None,
 	) -> T: ...
 
 	def create_entity(
@@ -46,9 +46,7 @@ class ECS:
 
 		# Create default components for the entity
 		for component_type, component_data in entity_components.items():
-			self._components.setdefault(component_type, {})[new_entity.id] = component_type(
-				*component_data
-			)
+			self._components.setdefault(component_type, {})[new_entity.id] = component_type(*component_data)
 			self._component_entities[component_type].add(new_entity.id)
 
 		return new_entity

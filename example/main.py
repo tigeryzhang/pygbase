@@ -44,9 +44,7 @@ def main():
 	pygbase.Events.add_handler(
 		"all",
 		pygame.KEYDOWN,
-		handler=lambda e: (
-			pygbase.Events.post_event(pygame.QUIT) if e.key == pygame.K_ESCAPE else None
-		),
+		handler=lambda e: pygbase.Events.post_event(pygame.QUIT) if e.key == pygame.K_ESCAPE else None,
 	)
 
 	# Debug toggle

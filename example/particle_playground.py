@@ -11,10 +11,16 @@ class ParticlePlayground(pygbase.GameState, name="particles"):
 		from menu import Menu
 
 		with Button(
-			self.set_next_state_type, callback_args=(Menu, ()), pos=(10, 10), size=(150, Fit())
+			self.set_next_state_type,
+			callback_args=(Menu, ()),
+			pos=(10, 10),
+			size=(150, Fit()),
 		) as ui:
 			with Image(
-				"image/button", size=(Grow(), Fit()), x_align=XAlign.CENTER, y_align=YAlign.CENTER
+				"image/button",
+				size=(Grow(), Fit()),
+				x_align=XAlign.CENTER,
+				y_align=YAlign.CENTER,
 			):
 				Text("Back", 20, "white")
 
@@ -22,7 +28,8 @@ class ParticlePlayground(pygbase.GameState, name="particles"):
 		self.ui = ui
 
 		self.camera_start_pos = pygame.Vector2(
-			-pygbase.Common.get("screen_width") / 2, -pygbase.Common.get("screen_height") / 2
+			-pygbase.Common.get("screen_width") / 2,
+			-pygbase.Common.get("screen_height") / 2,
 		)
 		self.camera_controller = pygbase.CameraController(self.camera_start_pos)
 		self.mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
@@ -33,13 +40,12 @@ class ParticlePlayground(pygbase.GameState, name="particles"):
 		)
 
 		self.mouse_spawner = self.particle_manager.add_spawner(
-			pygbase.CircleSpawner(
-				self.mouse_pos, 0.01, 30, 50, False, "test", self.particle_manager
-			)
+			pygbase.CircleSpawner(self.mouse_pos, 0.01, 30, 50, False, "test", self.particle_manager)
 		)
 
 		self.mouse_attractor = self.particle_manager.add_affector(
-			pygbase.AffectorTypes.ATTRACTOR, pygbase.ParticleAttractor(self.mouse_pos, 200, 40000)
+			pygbase.AffectorTypes.ATTRACTOR,
+			pygbase.ParticleAttractor(self.mouse_pos, 200, 40000),
 		)
 		self.mouse_attractor.active = False
 
@@ -68,7 +74,5 @@ class ParticlePlayground(pygbase.GameState, name="particles"):
 
 		self.particle_manager.draw(surface, self.camera_controller.camera)
 
-		pygame.draw.circle(
-			surface, "yellow", self.camera_controller.camera.world_to_screen((0, 0)), 5
-		)
+		pygame.draw.circle(surface, "yellow", self.camera_controller.camera.world_to_screen((0, 0)), 5)
 		self.ui.draw(surface)

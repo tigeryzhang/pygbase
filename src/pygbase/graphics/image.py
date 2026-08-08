@@ -7,7 +7,13 @@ from ..common import Common
 
 
 class Image:
-	def __init__(self, image: str | pygame.Surface, scale: float | tuple[float, float], rotatable: bool, scale_by: bool = True):
+	def __init__(
+		self,
+		image: str | pygame.Surface,
+		scale: float | tuple[float, float],
+		rotatable: bool,
+		scale_by: bool = True,
+	):
 		if isinstance(image, str):
 			image: pygame.Surface = pygame.image.load(image).convert_alpha()
 
@@ -33,10 +39,10 @@ class Image:
 			self.angled_images.append(pygame.transform.rotate(self.image, current_angle).convert_alpha())
 			current_angle += self.rotate_angle
 
-	def scale(self, scale: tuple[float, float]) -> "Image":
+	def scale(self, scale: tuple[float, float]) -> Image:
 		return Image(self.image, scale, self.rotatable, scale_by=False)
 
-	def scale_by(self, scale: tuple[float, float]) -> "Image":
+	def scale_by(self, scale: tuple[float, float]) -> Image:
 		return Image(self.image, scale, self.rotatable, scale_by=True)
 
 	def get_image(self, angle: float = 0) -> pygame.Surface:
@@ -56,7 +62,16 @@ class Image:
 		image_index = min(max(image_index, 0), len(self.angled_images) - 1)
 		return self.angled_images[image_index]
 
-	def draw(self, surface: pygame.Surface, pos: pygame.Vector2 | tuple[float, float], angle: float = 0, pivot_point: tuple[float, float] = (0, 0), flip: tuple[bool, bool] = (False, False), draw_pos: str = "topleft", flags: int = 0):
+	def draw(
+		self,
+		surface: pygame.Surface,
+		pos: pygame.Vector2 | tuple[float, float],
+		angle: float = 0,
+		pivot_point: tuple[float, float] = (0, 0),
+		flip: tuple[bool, bool] = (False, False),
+		draw_pos: str = "topleft",
+		flags: int = 0,
+	):
 		factor = -1 if flip[0] ^ flip[1] else 1  # Exclusive or
 		image = self.get_image(angle * factor)
 

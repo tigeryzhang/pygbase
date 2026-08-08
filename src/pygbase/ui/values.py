@@ -1,8 +1,6 @@
 import enum
 from dataclasses import dataclass
 
-import pygame
-
 EPSILON = 0.0001
 
 

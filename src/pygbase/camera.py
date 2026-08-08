@@ -55,9 +55,7 @@ class Camera:
 			pos[1] - self.pos.y - self._current_shake_offset.y
 		)
 
-	def world_to_screen_rect[RectType: pygame.Rect | pygame.FRect](
-		self, rect: RectType
-	) -> RectType:
+	def world_to_screen_rect[RectType: pygame.Rect | pygame.FRect](self, rect: RectType) -> RectType:
 		new_rect = rect.copy()
 		new_rect.topleft = self.world_to_screen(new_rect.topleft)
 		return new_rect
@@ -84,24 +82,20 @@ class CameraController:
 		screen_height = Common.get("screen_height")
 		if self.keep_in is not None:
 			if self.keep_in[2] - self.keep_in[0] < screen_width:
-				if self.keep_in[0] < self._camera.pos.x:
-					self._camera.pos.x = self.keep_in[0]
+				self._camera.pos.x = min(self._camera.pos.x, self.keep_in[0])
 				if self._camera.pos.x + screen_width < self.keep_in[2]:
 					self._camera.pos.x = self.keep_in[2] - screen_width
 			else:
-				if self._camera.pos.x < self.keep_in[0] - 30:
-					self._camera.pos.x = self.keep_in[0] - 30
+				self._camera.pos.x = max(self._camera.pos.x, self.keep_in[0] - 30)
 				if self.keep_in[2] + 30 < self._camera.pos.x + screen_width:
 					self._camera.pos.x = self.keep_in[2] - screen_width + 30
 
 			if self.keep_in[3] - self.keep_in[1] < screen_height:
-				if self.keep_in[1] < self._camera.pos.y:
-					self._camera.pos.y = self.keep_in[1]
+				self._camera.pos.y = min(self._camera.pos.y, self.keep_in[1])
 				if self._camera.pos.y + screen_height < self.keep_in[3]:
 					self._camera.pos.y = self.keep_in[3] - screen_height
 			else:
-				if self._camera.pos.y < self.keep_in[1] - 30:
-					self._camera.pos.y = self.keep_in[1] - 30
+				self._camera.pos.y = max(self._camera.pos.y, self.keep_in[1] - 30)
 				if self.keep_in[3] + 30 < self._camera.pos.y + screen_height:
 					self._camera.pos.y = self.keep_in[3] - screen_height + 30
 
@@ -124,9 +118,7 @@ class CameraController:
 			x_input = Input.key_pressed(pygame.K_d) - Input.key_pressed(pygame.K_a)
 			y_input = Input.key_pressed(pygame.K_s) - Input.key_pressed(pygame.K_w)
 
-			self._camera.set_pos(
-				self._camera.pos + pygame.Vector2(x_input, y_input) * speed * delta
-			)
+			self._camera.set_pos(self._camera.pos + pygame.Vector2(x_input, y_input) * speed * delta)
 
 		self._handle_bounds()
 

@@ -62,7 +62,11 @@ class Menu(pygbase.GameState, name="menu"):
 				Text("Dialogue", 40, "white")
 
 			with (
-				Button(self.set_next_state_type, callback_args=(Tweens, ()), size=(Grow(), Fit())),
+				Button(
+					self.set_next_state_type,
+					callback_args=(Tweens, ()),
+					size=(Grow(), Fit()),
+				),
 				Image(
 					"image/button",
 					size=(Grow(), Fit()),
@@ -73,7 +77,17 @@ class Menu(pygbase.GameState, name="menu"):
 				Text("Tweens", 40, "white")
 
 			TextSelector(
-				["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
+				[
+					"One",
+					"Two",
+					"Three",
+					"Four",
+					"Five",
+					"Six",
+					"Seven",
+					"Eight",
+					"Nine",
+				],
 				"image/left",
 				"image/right",
 				size=(Grow(), Fit()),
@@ -86,7 +100,10 @@ class Menu(pygbase.GameState, name="menu"):
 			)
 
 			self.progress_bar = ProgressBar(
-				"green", size=(Grow(), 60), bg_color=(0, 0, 0, 100), padding=Padding.all(5)
+				"green",
+				size=(Grow(), 60),
+				bg_color=(0, 0, 0, 100),
+				padding=Padding.all(5),
 			)
 
 		self.ui = ui

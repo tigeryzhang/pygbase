@@ -54,22 +54,43 @@ class Debug:
 			cls._debug_surface.fill((0, 0, 0, 0))
 
 	@classmethod
-	def update_timing_text(cls, delta: float, fps: float, ):
+	def update_timing_text(
+		cls,
+		delta: float,
+		fps: float,
+	):
 		if cls._show_timing_debug:
 			cls._timing_surf = cls._timing_font.render(f"fps: {fps}, delta: {delta}", True, "yellow")
 
 	@classmethod
-	def draw_rect(cls, rect: pygame.typing.RectLike, color: pygame.typing.ColorLike, width: int = 1):
+	def draw_rect(
+		cls,
+		rect: pygame.typing.RectLike,
+		color: pygame.typing.ColorLike,
+		width: int = 1,
+	):
 		if cls._active:
 			pygame.draw.rect(cls._debug_surface, color, rect, width=width)
 
 	@classmethod
-	def draw_circle(cls, center: pygame.typing.Point, radius: float, color: pygame.typing.ColorLike, width: int = 1):
+	def draw_circle(
+		cls,
+		center: pygame.typing.Point,
+		radius: float,
+		color: pygame.typing.ColorLike,
+		width: int = 1,
+	):
 		if cls._active:
 			pygame.draw.circle(cls._debug_surface, color, center, radius, width=width)
 
 	@classmethod
-	def draw_line(cls, start: pygame.typing.Point, end: pygame.typing.Point, color: pygame.typing.ColorLike, width: int = 1):
+	def draw_line(
+		cls,
+		start: pygame.typing.Point,
+		end: pygame.typing.Point,
+		color: pygame.typing.ColorLike,
+		width: int = 1,
+	):
 		if cls._active:
 			pygame.draw.line(cls._debug_surface, color, start, end, width=width)
 

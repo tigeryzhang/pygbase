@@ -13,7 +13,15 @@ if TYPE_CHECKING:
 
 
 class ParticleSpawner:
-	def __init__(self, pos: pygame.typing.Point, cooldown: float, amount: int, start_active: bool, particle_type: str, manager: "ParticleManager"):
+	def __init__(
+		self,
+		pos: pygame.typing.Point,
+		cooldown: float,
+		amount: int,
+		start_active: bool,
+		particle_type: str,
+		manager: ParticleManager,
+	):
 		self._linked_pos: bool
 		if isinstance(pos, pygame.Vector2):
 			self._linked_pos = True
@@ -53,7 +61,17 @@ class ParticleSpawner:
 
 
 class PointSpawner(ParticleSpawner):
-	def __init__(self, pos, cooldown: float, amount: int, start_active: bool, particle_type: str, manager: "ParticleManager", angle_range: tuple[float, float] = (0, 360), velocity_range: tuple[float, float] = (100.0, 200.0)):
+	def __init__(
+		self,
+		pos,
+		cooldown: float,
+		amount: int,
+		start_active: bool,
+		particle_type: str,
+		manager: ParticleManager,
+		angle_range: tuple[float, float] = (0, 360),
+		velocity_range: tuple[float, float] = (100.0, 200.0),
+	):
 		super().__init__(pos, cooldown, amount, start_active, particle_type, manager)
 
 		self.angle_range = angle_range
@@ -62,27 +80,26 @@ class PointSpawner(ParticleSpawner):
 	def spawn(self):
 		initial_velocity = get_angled_vector(random.uniform(*self.angle_range), random.uniform(*self.velocity_range))
 
-		self.manager.add_particle(
-			self.pos,
-			self.particle_settings,
-			initial_velocity
-		)
+		self.manager.add_particle(self.pos, self.particle_settings, initial_velocity)
 
 
 class CircleSpawner(ParticleSpawner):
 	def __init__(
-			self,
-			pos: pygame.typing.Point,
-			cooldown: float,
-			amount: int,
-			radius: float,
-			start_active: bool,
-			particle_type: str,
-			manager: "ParticleManager",
-			spawn_velocity: pygame.typing.Point = (0, 0),
-			linear_velocity_range: tuple[tuple[float, float], tuple[float, float]] = ((0, 0), (0, 0)),
-			radial_velocity_range: tuple[float, float] = (0, 0),
-			radial_offset_range: tuple[float, float] = (0, 0)
+		self,
+		pos: pygame.typing.Point,
+		cooldown: float,
+		amount: int,
+		radius: float,
+		start_active: bool,
+		particle_type: str,
+		manager: ParticleManager,
+		spawn_velocity: pygame.typing.Point = (0, 0),
+		linear_velocity_range: tuple[tuple[float, float], tuple[float, float]] = (
+			(0, 0),
+			(0, 0),
+		),
+		radial_velocity_range: tuple[float, float] = (0, 0),
+		radial_offset_range: tuple[float, float] = (0, 0),
 	):
 		super().__init__(pos, cooldown, amount, start_active, particle_type, manager)
 		self.radius = radius
@@ -93,24 +110,34 @@ class CircleSpawner(ParticleSpawner):
 		self.radial_offset_range = radial_offset_range
 
 	def spawn(self):
-		offset = get_angled_vector(random.uniform(0, 360), random.uniform(0, self.radius ** 2) ** 0.5)
+		offset = get_angled_vector(random.uniform(0, 360), random.uniform(0, self.radius**2) ** 0.5)
 		offset.rotate_ip_rad(random.uniform(*self.radial_offset_range))
 
 		self.manager.add_particle(
 			self.pos + offset,
 			self.particle_settings,
 			initial_velocity=(
-					offset.normalize()
-					* random.uniform(*self.radial_velocity_range)
-					+ pygame.Vector2(random.uniform(*self.linear_velocity_range[0]), random.uniform(*self.linear_velocity_range[1]))
-					+ self.spawn_velocity
-			)
-
+				offset.normalize() * random.uniform(*self.radial_velocity_range)
+				+ pygame.Vector2(
+					random.uniform(*self.linear_velocity_range[0]),
+					random.uniform(*self.linear_velocity_range[1]),
+				)
+				+ self.spawn_velocity
+			),
 		)
 
 
 class RectSpawner(ParticleSpawner):
-	def __init__(self, pos: pygame.typing.Point, cooldown: float, amount: int, size: tuple, start_active: bool, particle_type: str, manager: "ParticleManager"):
+	def __init__(
+		self,
+		pos: pygame.typing.Point,
+		cooldown: float,
+		amount: int,
+		size: tuple,
+		start_active: bool,
+		particle_type: str,
+		manager: ParticleManager,
+	):
 		super().__init__(pos, cooldown, amount, start_active, particle_type, manager)
 
 		self.size = size
@@ -118,7 +145,4 @@ class RectSpawner(ParticleSpawner):
 	def spawn(self):
 		spawn_offset = random.uniform(0, self.size[0]), random.uniform(0, self.size[1])
 
-		self.manager.add_particle(
-			self.pos + spawn_offset,
-			self.particle_settings
-		)
+		self.manager.add_particle(self.pos + spawn_offset, self.particle_settings)

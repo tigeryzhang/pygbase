@@ -19,7 +19,12 @@ class UIAlignment(enum.Enum):
 	BOTTOM_RIGHT = enum.auto()
 
 	@classmethod
-	def set_rect(cls, rect: pygame.Rect | pygame.FRect, alignment: "UIAlignment", pos: pygame.typing.Point):
+	def set_rect(
+		cls,
+		rect: pygame.Rect | pygame.FRect,
+		alignment: UIAlignment,
+		pos: pygame.typing.Point,
+	):
 		if alignment == cls.TOP_LEFT:
 			rect.topleft = pos
 		elif alignment == cls.TOP_MID:
@@ -42,7 +47,7 @@ class UIAlignment(enum.Enum):
 			rect.bottomright = pos
 
 	@classmethod
-	def get_pos(cls, alignment: "UIAlignment", rect: pygame.Rect | pygame.FRect) -> tuple[float, float]:
+	def get_pos(cls, alignment: UIAlignment, rect: pygame.Rect | pygame.FRect) -> tuple[float, float]:
 		if alignment == cls.TOP_LEFT:
 			return rect.topleft
 		elif alignment == cls.TOP_MID:
@@ -74,16 +79,16 @@ class TextOverflowBehaviour(enum.Enum):
 
 class RawText:
 	def __init__(
-			self,
-			pos: tuple | pygame.Vector2,
-			font_name: str,
-			size: int,
-			colour: pygame.Color | str | tuple,
-			text: str = "",
-			use_sys: bool = False,
-			max_width: int = 0,
-			overflow_behaviour: TextOverflowBehaviour = TextOverflowBehaviour.SHRINK,
-			alignment: UIAlignment = UIAlignment.TOP_LEFT,
+		self,
+		pos: tuple | pygame.Vector2,
+		font_name: str,
+		size: int,
+		colour: pygame.Color | str | tuple,
+		text: str = "",
+		use_sys: bool = False,
+		max_width: int = 0,
+		overflow_behaviour: TextOverflowBehaviour = TextOverflowBehaviour.SHRINK,
+		alignment: UIAlignment = UIAlignment.TOP_LEFT,
 	):
 		if use_sys:
 			self.font = pygame.font.SysFont(font_name, size)

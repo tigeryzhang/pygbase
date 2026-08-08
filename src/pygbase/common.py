@@ -23,9 +23,7 @@ class Common:
 
 	_resource_types: dict[str, int] = {}
 
-	_particle_settings: dict[
-		str, dict["ParticleOptions", str | list[pygame.typing.ColorLike] | tuple | bool]
-	] = {
+	_particle_settings: dict[str, dict[ParticleOptions, str | list[pygame.typing.ColorLike] | tuple | bool]] = {
 		"default": {
 			ParticleOptions.NAME: "default",
 			ParticleOptions.COLOR: ["white"],
@@ -85,15 +83,15 @@ class Common:
 
 	@classmethod
 	def add_particle_setting(
-			cls,
-			name: str,
-			color: list[pygame.typing.ColorLike],
-			size: tuple[float, float],
-			size_decay: tuple[float, float],
-			velocity_decay: tuple[float, float],
-			gravity: tuple[float, float],
-			effector: bool,
-			bounce: tuple[tuple[float, float], tuple[float, float]],
+		cls,
+		name: str,
+		color: list[pygame.typing.ColorLike],
+		size: tuple[float, float],
+		size_decay: tuple[float, float],
+		velocity_decay: tuple[float, float],
+		gravity: tuple[float, float],
+		effector: bool,
+		bounce: tuple[tuple[float, float], tuple[float, float]],
 	):
 		if name not in cls._particle_settings:
 			cls._particle_settings[name] = {
@@ -111,16 +109,16 @@ class Common:
 
 	@classmethod
 	def get_particle_setting(
-			cls, name: str
+		cls, name: str
 	) -> dict[ParticleOptions, str | list[pygame.typing.ColorLike] | tuple | bool]:
 		if name in cls._particle_settings:
 			return cls._particle_settings[name]
 		else:
-			logging.warning(
-				f"Particle setting name: `{name}` does not exist. Using default settings."
-			)
+			logging.warning(f"Particle setting name: `{name}` does not exist. Using default settings.")
 			return cls._particle_settings["default"]
 
 	@classmethod
-	def get_particle_settings(cls) -> dict[str, dict["ParticleOptions", str | list[pygame.typing.ColorLike] | tuple | bool]]:
+	def get_particle_settings(
+		cls,
+	) -> dict[str, dict[ParticleOptions, str | list[pygame.typing.ColorLike] | tuple | bool]]:
 		return cls._particle_settings
