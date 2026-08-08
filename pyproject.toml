@@ -1,30 +1,33 @@
 [project]
 name = "pygbase-engine"
-version = "0.0.1"
+version = "0.0.2"
 description = "A simple engine based on pygame-ce"
 readme = "README.md"
-authors = [{ name = "Yu266426", email = "yu266426@gmail.com" }]
-license = { file = "LICENSE" }
+authors = [{ name = "Tiger Zhang", email = "yu266426@gmail.com" }]
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
 ]
 keywords = ["pygame", "pygame-ce", "game", "game engine"]
 dependencies = [
-    "pygame-ce>=2.5.6",
+    "pygame-ce>=2.5.7",
 ]
 requires-python = ">=3.14"
 
 [project.urls]
 Homepage = "https://github.com/Yu266426/pygbase"
 
+[project.scripts]
+example = "example:main"
+
 [build-system]
-requires = ["uv_build>=0.9.4"]
+requires = ["uv_build>=0.12.1,<0.13.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = "pygbase"
-module-root = ""
+# module-root = "src"
 
 [dependency-groups]
 dev = [
@@ -32,4 +35,4 @@ dev = [
 ]
 
 [tool.ruff.lint]
-ignore = ["RUF012"]
+ignore = ["RUF012", "SIM117"]

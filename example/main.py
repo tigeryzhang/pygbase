@@ -2,9 +2,9 @@ import logging
 import pathlib
 
 import pygame
+from menu import Menu
 
 import pygbase
-from menu import Menu
 
 
 def toggle_debug(event: pygame.Event):
@@ -14,8 +14,8 @@ def toggle_debug(event: pygame.Event):
 		pygbase.Debug.toggle()
 
 
-if __name__ == "__main__":
-	CURRENT_DIR = pathlib.Path.cwd() / "test"
+def main():
+	CURRENT_DIR = pathlib.Path.cwd() / "example"
 
 	pygbase.init((800, 800))
 	# pygbase.Debug.show()
@@ -44,9 +44,9 @@ if __name__ == "__main__":
 	pygbase.Events.add_handler(
 		"all",
 		pygame.KEYDOWN,
-		handler=lambda e: pygbase.Events.post_event(pygame.QUIT)
-		if e.key == pygame.K_ESCAPE
-		else None,
+		handler=lambda e: (
+			pygbase.Events.post_event(pygame.QUIT) if e.key == pygame.K_ESCAPE else None
+		),
 	)
 
 	# Debug toggle
@@ -62,3 +62,7 @@ if __name__ == "__main__":
 	app.run()
 
 	pygbase.quit()
+
+
+if __name__ == "__main__":
+	main()

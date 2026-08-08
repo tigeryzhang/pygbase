@@ -8,31 +8,86 @@ class Menu(pygbase.GameState, name="menu"):
 	def __init__(self):
 		super().__init__()
 
-		from particle_playground import ParticlePlayground
 		from dialogue_testing import DialogueTesting
+		from particle_playground import ParticlePlayground
 		from tweens import Tweens
-		with Frame(size=(Grow(), Grow()), padding=Padding.all(10)) as ui:
-			with Frame(size=(250, Grow()), layout=Layout.TOP_TO_BOTTOM, padding=Padding.all(5), gap=10, bg_color=(50, 50, 50, 100)) as button_frame:
-				with Button(print, callback_args=("Button Pressed!",), size=(Grow(), Fit())):
-					with Image("image/button", size=(Grow(), Fit()), x_align=XAlign.CENTER, y_align=YAlign.CENTER):
-						Text("Click", 40, "white")
 
-				with Button(self.set_next_state_type, callback_args=(ParticlePlayground, ()), size=(Grow(), Fit())):
-					with Image("image/button", size=(Grow(), Fit()), x_align=XAlign.CENTER, y_align=YAlign.CENTER):
-						Text("Particles", 40, "white")
+		with (
+			Frame(size=(Grow(), Grow()), padding=Padding.all(10)) as ui,
+			Frame(
+				size=(250, Grow()),
+				layout=Layout.TOP_TO_BOTTOM,
+				padding=Padding.all(5),
+				gap=10,
+				bg_color=(50, 50, 50, 100),
+			) as button_frame,
+		):
+			with Button(print, callback_args=("Button Pressed!",), size=(Grow(), Fit())):
+				with Image(
+					"image/button",
+					size=(Grow(), Fit()),
+					x_align=XAlign.CENTER,
+					y_align=YAlign.CENTER,
+				):
+					Text("Click", 40, "white")
 
-				with Button(self.set_next_state_type, callback_args=(DialogueTesting, ()), size=(Grow(), Fit())):
-					with Image("image/button", size=(Grow(), Fit()), x_align=XAlign.CENTER, y_align=YAlign.CENTER):
-						Text("Dialogue", 40, "white")
+			with (
+				Button(
+					self.set_next_state_type,
+					callback_args=(ParticlePlayground, ()),
+					size=(Grow(), Fit()),
+				),
+				Image(
+					"image/button",
+					size=(Grow(), Fit()),
+					x_align=XAlign.CENTER,
+					y_align=YAlign.CENTER,
+				),
+			):
+				Text("Particles", 40, "white")
 
-				with Button(self.set_next_state_type, callback_args=(Tweens, ()), size=(Grow(), Fit())):
-					with Image("image/button", size=(Grow(), Fit()), x_align=XAlign.CENTER, y_align=YAlign.CENTER):
-						Text("Tweens", 40, "white")
+			with (
+				Button(
+					self.set_next_state_type,
+					callback_args=(DialogueTesting, ()),
+					size=(Grow(), Fit()),
+				),
+				Image(
+					"image/button",
+					size=(Grow(), Fit()),
+					x_align=XAlign.CENTER,
+					y_align=YAlign.CENTER,
+				),
+			):
+				Text("Dialogue", 40, "white")
 
-				TextSelector(["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"], "image/left", "image/right", size=(Grow(), Fit()))
-				self.selector = TextSelector(["1", "2", "3", "4", "5", "6", "7", "8", "9"], "image/left", "image/right", size=(Grow(), Fit()))
+			with (
+				Button(self.set_next_state_type, callback_args=(Tweens, ()), size=(Grow(), Fit())),
+				Image(
+					"image/button",
+					size=(Grow(), Fit()),
+					x_align=XAlign.CENTER,
+					y_align=YAlign.CENTER,
+				),
+			):
+				Text("Tweens", 40, "white")
 
-				self.progress_bar = ProgressBar("green", size=(Grow(), 60), bg_color=(0, 0, 0, 100), padding=Padding.all(5))
+			TextSelector(
+				["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"],
+				"image/left",
+				"image/right",
+				size=(Grow(), Fit()),
+			)
+			self.selector = TextSelector(
+				["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+				"image/left",
+				"image/right",
+				size=(Grow(), Fit()),
+			)
+
+			self.progress_bar = ProgressBar(
+				"green", size=(Grow(), 60), bg_color=(0, 0, 0, 100), padding=Padding.all(5)
+			)
 
 		self.ui = ui
 		self.button_frame = button_frame

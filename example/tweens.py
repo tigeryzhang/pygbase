@@ -9,8 +9,13 @@ class Tweens(pygbase.GameState, name="tweens"):
 		super().__init__()
 
 		from menu import Menu
-		with Button(self.set_next_state_type, callback_args=(Menu, ()), pos=(10, 10), size=(150, Fit())) as ui:
-			with Image("image/button", size=(Grow(), Fit()), x_align=XAlign.CENTER, y_align=YAlign.CENTER):
+
+		with Button(
+			self.set_next_state_type, callback_args=(Menu, ()), pos=(10, 10), size=(150, Fit())
+		) as ui:
+			with Image(
+				"image/button", size=(Grow(), Fit()), x_align=XAlign.CENTER, y_align=YAlign.CENTER
+			):
 				Text("Back", 20, "white")
 
 		ui.resolve_layout(pygbase.Common.get("screen_size"))
@@ -21,7 +26,7 @@ class Tweens(pygbase.GameState, name="tweens"):
 
 		self.tweens = [
 			pygbase.LinearTween(self.tween_values, self.tween_time),
-			pygbase.CubicTween(self.tween_values, self.tween_time)
+			pygbase.CubicTween(self.tween_values, self.tween_time),
 		]
 
 	def update(self, delta: float):
@@ -37,10 +42,19 @@ class Tweens(pygbase.GameState, name="tweens"):
 		surface.fill((20, 20, 20))
 
 		for tween_value in self.tween_values:
-			pygame.draw.line(surface, (50, 50, 50), (40 + (800 - 120) * tween_value, 100), (40 + (800 - 120) * tween_value, 700))
+			pygame.draw.line(
+				surface,
+				(50, 50, 50),
+				(40 + (800 - 120) * tween_value, 100),
+				(40 + (800 - 120) * tween_value, 700),
+			)
 
 		for index, tween in enumerate(self.tweens):
-			pygame.draw.line(surface, "light blue", (40, 150 + 50 * index), (800 - 80, 150 + 50 * index))
-			pygame.draw.circle(surface, "yellow", (40 + (800 - 120) * tween.value(), 150 + 50 * index), 5)
+			pygame.draw.line(
+				surface, "light blue", (40, 150 + 50 * index), (800 - 80, 150 + 50 * index)
+			)
+			pygame.draw.circle(
+				surface, "yellow", (40 + (800 - 120) * tween.value(), 150 + 50 * index), 5
+			)
 
 		self.ui.draw(surface)
