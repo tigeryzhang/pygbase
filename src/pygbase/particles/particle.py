@@ -9,6 +9,8 @@ from ..camera import Camera
 from ..common import Common
 from ..common import ParticleOptions as Options
 
+logger = logging.getLogger(__name__)
+
 
 class Particle:
 	__slots__ = [
@@ -29,7 +31,7 @@ class Particle:
 
 	@classmethod
 	def cache_particle_images(cls):
-		logging.debug("Caching Particles")
+		logger.debug("Caching Particles")
 
 		for particle_type, particle_data in Common.get_particle_settings().items():
 			cache = {}

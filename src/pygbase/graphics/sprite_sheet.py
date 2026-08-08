@@ -9,7 +9,7 @@ class SpriteSheet:
 		# Data info
 		self.n_rows: int = data["rows"]
 		self.n_cols: int = data["columns"]
-		self.scale: int = data["scale"] if data["scale"] != 0 else default_scale
+		self.scale: int = data["scale"] if data["scale"] != 0 else default_scale  # ty: ignore[invalid-assignment]
 		self.rotatable: bool = data["rotatable"]
 		self.tile_width: int = data["tile_width"] * self.scale
 		self.tile_height: int = data["tile_height"] * self.scale

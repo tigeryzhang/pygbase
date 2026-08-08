@@ -122,10 +122,9 @@ class RawText:
 			self.rendered_text = self.font.render(self.text, True, self.colour).convert_alpha()
 
 			# Scale down to fit surface
-			if self.max_width != 0:
-				if self.rendered_text.get_width() > self.max_width:
-					ratio = self.max_width / self.rendered_text.get_width()
-					self.rendered_text = pygame.transform.smoothscale_by(self.rendered_text, ratio)
+			if self.max_width != 0 and self.rendered_text.get_width() > self.max_width:
+				ratio = self.max_width / self.rendered_text.get_width()
+				self.rendered_text = pygame.transform.smoothscale_by(self.rendered_text, ratio)
 
 		self.reposition()
 

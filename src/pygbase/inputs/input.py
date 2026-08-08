@@ -1,4 +1,5 @@
 import typing
+from typing import cast
 
 import pygame
 
@@ -15,7 +16,7 @@ class Input:
 	# Mouse
 	_mouse_down: list[bool] = [False, False, False]
 	_mouse_up: list[bool] = [False, False, False]
-	_mouse_pressed: list[bool, bool, bool] = [False, False, False]
+	_mouse_pressed: list[bool] = [False, False, False]
 
 	_scroll: pygame.Vector2 = pygame.Vector2()
 
@@ -36,9 +37,10 @@ class Input:
 
 		cls._scroll.update(0)
 
-		cls._keys_down = pygame.key.get_just_pressed()
-		cls._keys_up = pygame.key.get_just_released()
-		cls._keys_pressed = pygame.key.get_pressed()
+		# TODO: Fix this type later
+		cls._keys_down = pygame.key.get_just_pressed()  # ty: ignore[invalid-assignment]
+		cls._keys_up = pygame.key.get_just_released()  # ty: ignore[invalid-assignment]
+		cls._keys_pressed = pygame.key.get_pressed()  # ty: ignore[invalid-assignment]
 
 		cls._mods = pygame.key.get_mods()
 
@@ -51,9 +53,9 @@ class Input:
 
 		key = user_input
 		if input_type == InputTypes.KEY:
-			key = cls._get_key_from_input(user_input)
+			key = cls._get_key_from_input(cast(str | int, user_input))
 		elif input_type == InputTypes.MOUSE:
-			key = cls._get_mouse_from_input(user_input)
+			key = cls._get_mouse_from_input(cast(MouseInput, user_input))
 
 		cls._keybinds[name] = (key, input_type)
 
@@ -223,6 +225,7 @@ class Input:
 	def mouse_scroll_y(cls) -> float:
 		return cls._scroll.y
 
+	# TODO: Fix modifiers to use actual bitmasking?
 	@classmethod
 	def check_modifiers(cls, *modifiers: int, use_and=True) -> bool:
 		if use_and:
@@ -232,8 +235,8 @@ class Input:
 			return True
 
 		else:
-			for modifiers in modifiers:
-				if cls._mods & modifiers:
+			for modifier in modifiers:
+				if cls._mods & modifier:
 					return True
 			return False
 

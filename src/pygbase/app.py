@@ -12,6 +12,8 @@ from .inputs.input import Input
 from .loader import Loading
 from .particles.particle import Particle
 
+logger = logging.getLogger(__name__)
+
 
 class App:
 	def __init__(
@@ -64,7 +66,7 @@ class App:
 			self.game_state = self.game_state.get_next_state()
 			self.game_state.enter()
 
-			logging.debug("Switching states, running garbage collector...")
+			logger.debug("Switching states, running garbage collector...")
 			gc.collect()
 
 	def run(self):

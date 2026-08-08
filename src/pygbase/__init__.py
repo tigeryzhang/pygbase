@@ -2,8 +2,7 @@ import logging
 
 import pygame.typing
 
-import pygbase.utils
-
+from . import utils
 from .app import App
 from .camera import Camera, CameraController
 from .common import Common
@@ -36,6 +35,7 @@ __all__ = [
 	"ResourceType",
 	"Resources",
 	"Timer",
+	"utils",
 ]
 
 

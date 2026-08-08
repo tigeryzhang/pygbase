@@ -38,7 +38,7 @@ class GameState:
 
 	def set_next_state_type(self, next_state: type[GameState], args: tuple):
 		if len(args) > 0:
-			self._next_state = next_state(*args)  # type: ignore
+			self._next_state = next_state(*args)
 		else:
 			self._next_state = next_state()
 

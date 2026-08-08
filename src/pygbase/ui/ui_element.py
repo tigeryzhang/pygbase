@@ -19,6 +19,8 @@ from .values import (
 	YAlign,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class Frame:
 	"""
@@ -185,7 +187,7 @@ class Frame:
 		traceback: TracebackType | None,
 	) -> bool:
 		if exc_type is not None:
-			logging.error(f"Exception raised {exc_value}")
+			logger.error(f"Exception raised {exc_value}")
 			return False  # True -> Suppress exception
 
 		self.element_stack.pop()
@@ -238,7 +240,7 @@ class Frame:
 			iterations += 1
 
 		if iterations >= max_iterations:
-			logging.warning("Warning: Layout did not converge after maximum iterations.")
+			logger.warning("Warning: Layout did not converge after maximum iterations.")
 
 		self.parent = None  # Detach from temporary root
 		return self.min_width, self.min_height

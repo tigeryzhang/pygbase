@@ -7,6 +7,8 @@ from typing import Any
 
 from .common import Common
 
+logger = logging.getLogger(__name__)
+
 
 class ResourceType:
 	def __init__(
@@ -111,7 +113,7 @@ class Resources:
 		# If all resources are loaded
 		if len(cls._resources_to_load) == 0:
 			for type_id, resource_type in cls._resource_types.items():
-				logging.info(f"Loaded {len(cls._loaded_resources[type_id])} {resource_type.name}")
+				logger.info(f"Loaded {len(cls._loaded_resources[type_id])} {resource_type.name}")
 			return True
 
 		# Load resources
@@ -127,7 +129,7 @@ class Resources:
 					resource_path = resource_info[1]
 					resource_name = resource_info[2]
 
-					logging.debug(f"Loading: {resource_path}")
+					logger.debug(f"Loading: {resource_path}")
 
 					with open(os.path.join(resource_type.container_path, "config.json")) as config_file:
 						config_data = json.load(config_file)
@@ -138,7 +140,7 @@ class Resources:
 							data, resource_path
 						)
 					else:
-						logging.warning(f"Skipping {resource_path}, uninitialized config")
+						logger.warning(f"Skipping {resource_path}, uninitialized config")
 
 			return False
 

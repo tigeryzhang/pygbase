@@ -5,6 +5,8 @@ import pygame
 
 from ..common import Common
 
+logger = logging.getLogger(__name__)
+
 
 class Image:
 	def __init__(
@@ -20,6 +22,8 @@ class Image:
 		if scale_by:
 			self.image = pygame.transform.scale_by(image, scale).convert_alpha()
 		else:
+			if isinstance(scale, int | float):
+				raise TypeError("`scale` needs to be (float, float) when not using scale_by")
 			self.image = pygame.transform.scale(image, scale).convert_alpha()
 
 		self.rotatable = rotatable
@@ -53,7 +57,7 @@ class Image:
 
 	def _get_angled_image(self, angle: float):
 		if not self.rotatable:
-			logging.error("Non-zero values of rotation not allowed for non-rotatable image")
+			logger.error("Non-zero values of rotation not allowed for non-rotatable image")
 			raise ValueError("Non-zero values of rotation not allowed for non-rotatable image")
 
 		angle %= 360

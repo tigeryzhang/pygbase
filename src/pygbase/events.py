@@ -61,12 +61,15 @@ class Events:
 			if event is not None:
 				cls._handlers[game_state_id][cls._convert_to_event_type(event)].remove(handler)
 			else:
-				for _event_type, handlers in cls._handlers[game_state_id].items():
+				# event_type -> handlers
+				for handlers in cls._handlers[game_state_id].values():
 					if handler in handlers:
 						handlers.remove(handler)
 		else:
-			for _game_state_id, events in cls._handlers.items():
-				for _event_type, handlers in events.items():
+			# game_state_id -> events
+			for events in cls._handlers.values():
+				# event_type -> handlers
+				for handlers in events.values():
 					if handler in handlers:
 						handlers.remove(handler)
 

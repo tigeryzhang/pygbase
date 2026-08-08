@@ -4,6 +4,8 @@ from typing import Any
 
 import pygame.typing
 
+logger = logging.getLogger(__name__)
+
 
 class ParticleOptions(enum.Enum):
 	NAME = enum.auto()
@@ -54,7 +56,7 @@ class Common:
 		if name not in cls._game_states:
 			cls._game_states[name] = game_state_id
 		else:
-			logging.error(f"Game state name: `{name}` already taken")
+			logger.error(f"Game state name: `{name}` already taken")
 			raise KeyError(f"Game state name: `{name}` does not exist")
 
 	@classmethod
@@ -62,7 +64,7 @@ class Common:
 		if name in cls._game_states:
 			return cls._game_states[name]
 		else:
-			logging.error(f"Game state name: `{name}` does not exist")
+			logger.error(f"Game state name: `{name}` does not exist")
 			raise KeyError(f"Game state name: `{name}` does not exist")
 
 	@classmethod
@@ -70,7 +72,7 @@ class Common:
 		if name not in cls._resource_types:
 			cls._resource_types[name] = resource_id
 		else:
-			logging.error(f"Resource name: `{name}` already taken")
+			logger.error(f"Resource name: `{name}` already taken")
 			raise KeyError(f"Resource name: `{name}` does not exist")
 
 	@classmethod
@@ -78,7 +80,7 @@ class Common:
 		if name in cls._resource_types:
 			return cls._resource_types[name]
 		else:
-			logging.error(f"Resource name: `{name}` does not exist")
+			logger.error(f"Resource name: `{name}` does not exist")
 			raise KeyError(f"Resource name: `{name}` does not exist")
 
 	@classmethod
@@ -105,7 +107,7 @@ class Common:
 				ParticleOptions.BOUNCE: bounce,
 			}
 		else:
-			logging.warning(f"Particle setting name: `{name}` already taken")
+			logger.warning(f"Particle setting name: `{name}` already taken")
 
 	@classmethod
 	def get_particle_setting(
@@ -114,7 +116,7 @@ class Common:
 		if name in cls._particle_settings:
 			return cls._particle_settings[name]
 		else:
-			logging.warning(f"Particle setting name: `{name}` does not exist. Using default settings.")
+			logger.warning(f"Particle setting name: `{name}` does not exist. Using default settings.")
 			return cls._particle_settings["default"]
 
 	@classmethod

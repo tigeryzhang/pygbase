@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class ParticleManager:
-	def __init__(self, chunk_size: int = 400, colliders: tuple[pygame.Rect | pygame.FRect] = ()):
+	def __init__(self, chunk_size: int = 400, colliders: tuple[pygame.Rect | pygame.FRect, ...] = ()):
 		self.chunk_size = chunk_size
 
 		self.particles: dict[tuple[int, int], list[Particle]] = {}
@@ -74,7 +74,8 @@ class ParticleManager:
 		]
 
 	def clear(self):
-		for chunk_pos, chunk in self.particles.items():
+		# chunk_pos
+		for chunk in self.particles.values():
 			chunk.clear()
 
 		self.particles.clear()
@@ -90,7 +91,9 @@ class ParticleManager:
 		if spawner in self.spawners:
 			self.spawners.remove(spawner)
 
-	def add_affector[AffectorType](self, affector_type: AffectorTypes, affector: AffectorType) -> AffectorType:
+	def add_affector[AffectorType: ParticleAttractor](
+		self, affector_type: AffectorTypes, affector: AffectorType
+	) -> AffectorType:
 		self.affectors[affector_type].append(affector)
 		return affector
 
@@ -99,7 +102,8 @@ class ParticleManager:
 			if spawner.active:
 				spawner.update(delta)
 
-		for affector_type, affectors in self.affectors.items():
+		# affector_type
+		for affectors in self.affectors.values():
 			for affector in affectors:
 				if affector.active:
 					affector.affect_particles(
@@ -145,7 +149,7 @@ class ParticleManager:
 
 		# Debug
 		if Debug.is_active():
-			for col, row in self.particles.keys():
+			for col, row in self.particles:
 				Debug.draw_rect(
 					pygame.Rect(
 						camera.world_to_screen((col * self.chunk_size, row * self.chunk_size)),
@@ -163,7 +167,8 @@ class ParticleManager:
 						width=3,
 					)
 
-			for affector_type, affectors in self.affectors.items():
+			# affector_type
+			for affectors in self.affectors.values():
 				for affector in affectors:
 					left_chunk_col, top_chunk_row = self.get_chunk(affector.pos - pygame.Vector2(affector.radius))
 					(

@@ -11,6 +11,7 @@ class AffectorTypes(enum.Enum):
 	ATTRACTOR = enum.auto()
 
 
+# TODO: Switch to inheritance. Remember to fix generics in particle manager
 class ParticleAttractor:
 	def __init__(self, pos: pygame.typing.Point, radius: float, strength: float):
 		self._linked_pos: bool

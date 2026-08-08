@@ -9,13 +9,13 @@ class Debug:
 	_debug_surface: pygame.Surface
 
 	_show_timing_debug: bool = False
-	_timing_font: pygame.font.SysFont
+	_timing_font: pygame.font.Font
 	_timing_surf: pygame.Surface
 
 	@classmethod
 	def init(cls) -> None:
 		cls._debug_surface = pygame.Surface(Common.get("screen_size"), flags=pygame.SRCALPHA)
-		cls._timing_font: pygame.font.SysFont = pygame.font.SysFont("arial", 30)
+		cls._timing_font: pygame.font.Font = pygame.font.SysFont("arial", 30)
 
 	@classmethod
 	def show(cls):
