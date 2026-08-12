@@ -8,7 +8,7 @@ class ParticlePlayground(pygbase.GameState, name="particles"):
 	def __init__(self):
 		super().__init__()
 
-		from menu import Menu
+		from .menu import Menu
 
 		with Button(
 			self.set_next_state_type,

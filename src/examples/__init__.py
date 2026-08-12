@@ -2,7 +2,7 @@ import logging
 import pathlib
 
 import pygame
-from menu import Menu
+from .menu import Menu
 
 import pygbase
 
@@ -15,7 +15,7 @@ def toggle_debug(event: pygame.Event):
 
 
 def main():
-	CURRENT_DIR = pathlib.Path.cwd() / "example"
+	CURRENT_DIR = pathlib.Path.cwd() / "examples"
 
 	pygbase.init((800, 800))
 	# pygbase.Debug.show()
@@ -60,7 +60,3 @@ def main():
 	app.run()
 
 	pygbase.quit()
-
-
-if __name__ == "__main__":
-	main()

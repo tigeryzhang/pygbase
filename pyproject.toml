@@ -19,7 +19,7 @@ requires-python = ">=3.14"
 Homepage = "https://github.com/Yu266426/pygbase"
 
 [project.scripts]
-example = "example:main"
+examples = "examples:main"
 
 [build-system]
 requires = ["uv_build>=0.12.1,<0.13.0"]

@@ -9,7 +9,7 @@ class DialogueTesting(pygbase.GameState, name="dialogue"):
 
 		self.dialogue_manager = pygbase.DialogueManager(10, 0.02, "image/button")
 
-		from menu import Menu
+		from .menu import Menu
 
 		self.dialogue_manager.add_node(
 			pygbase.DialogueNode("first", "This is a test message, I don't know if this will work")

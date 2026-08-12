@@ -8,9 +8,9 @@ class Menu(pygbase.GameState, name="menu"):
 	def __init__(self):
 		super().__init__()
 
-		from dialogue_testing import DialogueTesting
-		from particle_playground import ParticlePlayground
-		from tweens import Tweens
+		from .dialogue_testing import DialogueTesting
+		from .particle_playground import ParticlePlayground
+		from .tweens import Tweens
 
 		with (
 			Frame(size=(Grow(), Grow()), padding=Padding.all(10)) as ui,
