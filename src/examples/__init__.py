@@ -7,6 +7,8 @@ import pygbase
 
 from .menu import Menu
 
+logger = logging.getLogger(__name__)
+
 
 def toggle_debug(event: pygame.Event):
 	if event.key == pygame.K_F3:
@@ -53,7 +55,7 @@ def main():
 
 	pygbase.Events.create_custom_event("test")
 
-	pygbase.Events.add_handler("all", "test", lambda e: logging.info("Received Test Event"))
+	pygbase.Events.add_handler("all", "test", lambda e: logger.info("Received Test Event"))
 
 	pygbase.Events.post_event("test")
 
