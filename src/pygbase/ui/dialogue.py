@@ -205,10 +205,13 @@ class DialogueManager:
 		if self.current_node != "":
 			self._make_ui()
 
-			self.get_current_node().process_message(self.starting_x, self.starting_y, self.width, self.word_gap)
+			assert self.starting_y is not None
+			assert self.width is not None
+			self.get_current_node().process_message(self.starting_x, self.starting_y, int(self.width), self.word_gap)
 			self.char_timer.start()
 
 	def update(self, delta: float):
+		assert self.ui is not None
 		self.ui.update(delta)
 
 		if self.has_current_node():
@@ -222,6 +225,7 @@ class DialogueManager:
 
 	def draw(self, surface: pygame.Surface):
 		if self.has_current_node():
+			assert self.ui is not None
 			self.ui.draw(surface)
 
 			self.get_current_node().draw(surface)

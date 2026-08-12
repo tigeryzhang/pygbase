@@ -392,18 +392,20 @@ class Frame:
 		children_gap = (len(self.children) - 1) * self.child_gap
 
 		if self.direction == Layout.LEFT_TO_RIGHT:
-			grow_children = [child for child in self.children if isinstance(child.size_settings[0], Grow)]
+			grow_children = [
+				(child, child.size_settings[0]) for child in self.children if isinstance(child.size_settings[0], Grow)
+			]
 
 			# Subtract children and gaps
 			remaining_width -= sum(child.size.x for child in self.children) + children_gap
 
 			while remaining_width > EPSILON and len(grow_children) > 0:
-				min_ratio = grow_children[0].width / grow_children[0].size_settings[0].weight
+				min_ratio = grow_children[0][0].width / grow_children[0][1].weight
 				second_min_ratio = float("inf")
 
 				# Find min and second_min ratios
-				for child in grow_children:
-					ratio = child.width / child.size_settings[0].weight
+				for child, size_settings in grow_children:
+					ratio = child.width / size_settings.weight
 
 					if ratio < min_ratio:
 						second_min_ratio = min_ratio
@@ -413,15 +415,15 @@ class Frame:
 						second_min_ratio = min(second_min_ratio, ratio)
 
 				total_weight = 0
-				for child in grow_children:
-					child_weight = child.size_settings[0].weight
-					ratio = child.width / child.size_settings[0].weight
+				for child, size_settings in grow_children:
+					child_weight = size_settings.weight
+					ratio = child.width / size_settings.weight
 
 					if ratio == min_ratio:
 						total_weight += child_weight
 
-				for child in grow_children:
-					child_weight = child.size_settings[0].weight
+				for child, size_settings in grow_children:
+					child_weight = size_settings.weight
 					ratio = child.width / child_weight
 
 					target_width = second_min_ratio * child_weight
@@ -433,7 +435,7 @@ class Frame:
 
 						if child.width > child._max_size.x:
 							child.width = child._max_size.x
-							grow_children.remove(child)
+							grow_children.remove((child, size_settings))
 
 						remaining_width -= child.width - prev_width
 
@@ -460,18 +462,20 @@ class Frame:
 					child.height = pygame.math.clamp(child.height, child.min_height, child._max_size.y)
 
 		if self.direction == Layout.TOP_TO_BOTTOM:
-			grow_children = [child for child in self.children if isinstance(child.size_settings[1], Grow)]
+			grow_children = [
+				(child, child.size_settings[1]) for child in self.children if isinstance(child.size_settings[1], Grow)
+			]
 
 			# Subtract children and gaps
 			remaining_height -= sum(child.size.y for child in self.children) + children_gap
 
 			while remaining_height > EPSILON and len(grow_children) > 0:
-				min_ratio = grow_children[0].height / grow_children[0].size_settings[1].weight
+				min_ratio = grow_children[0][0].height / grow_children[0][1].weight
 				second_min_ratio = float("inf")
 
 				# Find min and second_min ratios
-				for child in grow_children:
-					ratio = child.height / child.size_settings[1].weight
+				for child, size_settings in grow_children:
+					ratio = child.height / size_settings.weight
 
 					if ratio < min_ratio:
 						second_min_ratio = min_ratio
@@ -481,15 +485,15 @@ class Frame:
 						second_min_ratio = min(second_min_ratio, ratio)
 
 				total_weight = 0
-				for child in grow_children:
-					child_weight = child.size_settings[1].weight
-					ratio = child.height / child.size_settings[1].weight
+				for child, size_settings in grow_children:
+					child_weight = size_settings.weight
+					ratio = child.height / size_settings.weight
 
 					if ratio == min_ratio:
 						total_weight += child_weight
 
-				for child in grow_children:
-					child_weight = child.size_settings[1].weight
+				for child, size_settings in grow_children:
+					child_weight = size_settings.weight
 					ratio = child.height / child_weight
 
 					target_height = second_min_ratio * child_weight
@@ -504,7 +508,7 @@ class Frame:
 
 						if child.height > child._max_size.y:
 							child.height = child._max_size.y
-							grow_children.remove(child)
+							grow_children.remove((child, size_settings))
 
 						remaining_height -= child.height - prev_height
 

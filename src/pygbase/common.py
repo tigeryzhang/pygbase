@@ -122,5 +122,5 @@ class Common:
 	@classmethod
 	def get_particle_settings(
 		cls,
-	) -> dict[str, dict[ParticleOptions, str | list[pygame.typing.ColorLike] | tuple | bool]]:
+	) -> dict[str, dict]:
 		return cls._particle_settings
