@@ -2,7 +2,7 @@ import logging
 from collections import deque
 from collections.abc import Callable
 from types import TracebackType
-from typing import Any, Self
+from typing import Self
 
 import pygame
 
@@ -39,7 +39,7 @@ class Frame:
 		pos: tuple[float, float] = (0, 0),
 		size: tuple[float | Fit | Grow, float | Fit | Grow] = (Fit(), Fit()),
 		layout: Layout = Layout.LEFT_TO_RIGHT,
-		padding: Padding = Padding(),
+		padding: Padding | None = None,
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
@@ -69,7 +69,7 @@ class Frame:
 		self.size_settings = size
 
 		self.direction = layout
-		self.padding = padding
+		self.padding = padding or Padding()
 		self.child_gap = gap
 
 		self.x_alignment = x_align
@@ -182,8 +182,8 @@ class Frame:
 
 	def __exit__(
 		self,
-		exc_type: type | None,
-		exc_value: Any | None,
+		exc_type: object,
+		exc_value: object,
 		traceback: TracebackType | None,
 	) -> bool:
 		if exc_type is not None:

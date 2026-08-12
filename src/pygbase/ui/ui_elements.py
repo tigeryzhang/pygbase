@@ -18,7 +18,7 @@ class Text(Frame):
 		pos: tuple[float, float] = (0, 0),
 		size: tuple[float | Fit | Grow, float | Fit | Grow] = (Fit(), Fit()),
 		layout: Layout = Layout.LEFT_TO_RIGHT,
-		padding: Padding = Padding(),
+		padding: Padding | None = None,
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
@@ -84,7 +84,7 @@ class Image(Frame):
 		pos: tuple[float, float] = (0, 0),
 		size: tuple[float | Fit | Grow, float | Fit | Grow] = (Fit(), Fit()),
 		layout: Layout = Layout.LEFT_TO_RIGHT,
-		padding: Padding = Padding(),
+		padding: Padding | None = None,
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
@@ -141,7 +141,7 @@ class Image(Frame):
 				self._raw_image_surface.get_height(),
 			)
 		else:
-			raise ValueError(f"Type of image: `{type(image)}` is not str or Surface")
+			raise TypeError(f"Type of image: `{type(image)}` is not str or Surface")
 
 	def _fix_aspect_ratio(self):
 		if self.image is not None:
@@ -192,7 +192,7 @@ class Button(Frame):
 		pos: tuple[float, float] = (0, 0),
 		size: tuple[float | Fit | Grow, float | Fit | Grow] = (Fit(), Fit()),
 		layout: Layout = Layout.LEFT_TO_RIGHT,
-		padding: Padding = Padding(),
+		padding: Padding | None = None,
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
@@ -233,7 +233,7 @@ class TextSelector(Frame):
 		pos: tuple[float, float] = (0, 0),
 		size: tuple[float | Fit | Grow, float | Fit | Grow] = (Fit(), Fit()),
 		layout: Layout = Layout.LEFT_TO_RIGHT,
-		padding: Padding = Padding(),
+		padding: Padding | None = None,
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
@@ -292,7 +292,7 @@ class ProgressBar(Frame):
 		pos: tuple[float, float] = (0, 0),
 		size: tuple[float | Fit | Grow, float | Fit | Grow] = (Fit(), Fit()),
 		layout: Layout = Layout.LEFT_TO_RIGHT,
-		padding: Padding = Padding(),
+		padding: Padding | None = None,
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
