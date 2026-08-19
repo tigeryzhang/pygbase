@@ -1,11 +1,11 @@
 import pygame
+import pygame._sdl2.video as sdl_video
 
 from ..camera import Camera
-from ..common import Common
 
 
 class Shadow:
-	cached_shadows: list[pygame.Surface] = []
+	shadow_texture: sdl_video.Texture
 
 	def __init__(self, pos: pygame.typing.Point, size: float):
 		self._linked_pos: bool
@@ -18,21 +18,12 @@ class Shadow:
 
 		self.size = size
 
-		self.radius_interval = Common.get("lighting_radius_interval")
-
-		self.surf = self.cached_shadows[int(size / self.radius_interval)].copy()
-		self.surf_rect = self.surf.get_rect(center=self.pos)
-
-	def init_surf(self, brightness: int):
-		"""Called by LightingManager"""
-		self.surf.fill((brightness, brightness, brightness), special_flags=pygame.BLEND_MULT)
-
 	def update_pos(self, pos):
 		if self._linked_pos:
 			raise RuntimeError("Cannot modify linked position")
 
 		self.pos.update(pos)
 
-	def draw(self, surface: pygame.Surface, camera: Camera):
-		self.surf_rect.center = self.pos
-		surface.blit(self.surf, camera.world_to_screen_rect(self.surf_rect))
+	def draw(self, camera: Camera | None):
+		pos = self.pos if camera is None else camera.world_to_screen(self.pos)
+		Shadow.shadow_texture.draw(dstrect=(pos, (self.size, self.size)))

@@ -1,33 +1,28 @@
 import pygame
+import pygame._sdl2.video as sdl_video
+
+from pygbase.common import Common
 
 from ..camera import Camera
-from ..common import Common
 from .light import Light
 from .shadow import Shadow
 
 
 class LightingManager:
 	def __init__(self, default_brightness: float, shadow_brightness: float):
+		self.renderer: sdl_video.Renderer = Common.get("renderer")
+
 		self.brightness = default_brightness
 		self.shadow_brightness = shadow_brightness
 
-		self.lighting_surf = pygame.Surface((Common.get("screen_width"), Common.get("screen_height")))
-		self.lighting_surf.fill(
-			(
-				int(255 * default_brightness),
-				int(255 * default_brightness),
-				int(255 * default_brightness),
-			)
-		)
+		self.light_texture = sdl_video.Texture(self.renderer, Common.get("screen_size"), target=True)
+		self.light_texture.blend_mode = pygame.BLENDMODE_MUL
 
-		self.add_lighting_surf = pygame.Surface(
-			(Common.get("screen_width"), Common.get("screen_height")),
-			flags=pygame.SRCALPHA,
-		)
-		self.add_lighting_surf.fill((0, 0, 0))
+		self.add_light_texture = sdl_video.Texture(self.renderer, Common.get("screen_size"), target=True)
+		self.add_light_texture.blend_mode = pygame.BLENDMODE_ADD
 
-		self.shadow_surf = pygame.Surface((Common.get("screen_width"), Common.get("screen_height")))
-		self.shadow_surf.fill((255, 255, 255))
+		self.shadow_texture = sdl_video.Texture(self.renderer, Common.get("screen_size"), target=True)
+		self.shadow_texture.blend_mode = pygame.BLENDMODE_MUL
 
 		self.lights: list[Light] = []
 		self.shadows: list[Shadow] = []
@@ -41,7 +36,6 @@ class LightingManager:
 			self.lights.remove(light_source)
 
 	def add_shadow(self, shadow: Shadow) -> Shadow:
-		shadow.init_surf(int(self.shadow_brightness * 255))
 		self.shadows.append(shadow)
 		return shadow
 
@@ -50,23 +44,51 @@ class LightingManager:
 			self.shadows.remove(shadow)
 
 	def update(self, delta):
+		# TODO: Don't actually need
 		for light in self.lights:
 			light.update(delta)
 
-	def draw_shadows(self, surface: pygame.Surface, camera: Camera):
-		shadow_surf = self.shadow_surf.copy()
+	def draw_shadows(self, camera: Camera | None = None):
+		prev_target = self.renderer.target
+		self.renderer.target = self.shadow_texture
 
+		prev_draw_color = self.renderer.draw_color
+		self.renderer.draw_color = (255,255,255)
+		self.renderer.clear()
+		self.renderer.draw_color = prev_draw_color
+
+		# TODO: Make sure this actually works?
+		Shadow.shadow_texture.alpha = int(self.shadow_brightness * 255)
 		for shadow in self.shadows:
-			shadow.draw(shadow_surf, camera)
+			shadow.draw(camera)
 
-		surface.blit(shadow_surf, (0, 0), special_flags=pygame.BLEND_MULT)
+		self.renderer.target = prev_target
 
-	def draw_lights(self, surface: pygame.Surface, camera: Camera):
-		lighting_surf = self.lighting_surf.copy()
-		add_lighting_surf = self.add_lighting_surf.copy()
+		self.shadow_texture.draw()
+
+	def draw_lights(self, camera: Camera | None = None):
+		prev_target = self.renderer.target
+		prev_draw_color = self.renderer.draw_color
+
+		# Multiplicative lighting
+		self.renderer.target = self.light_texture
+		brightness = int(self.brightness * 255)
+		self.renderer.draw_color = (brightness, brightness, brightness)
+		self.renderer.clear()
 
 		for light in self.lights:
-			light.draw(lighting_surf, add_lighting_surf, camera)
+			light.draw_light(camera)
 
-		surface.blit(lighting_surf, (0, 0), special_flags=pygame.BLEND_MULT)
-		surface.blit(add_lighting_surf, (0, 0), special_flags=pygame.BLEND_ADD)
+		# Add lighting
+		self.renderer.target = self.add_light_texture
+		self.renderer.draw_color = (0, 0, 0)
+		self.renderer.clear()
+
+		for light in self.lights:
+			light.draw_add_light(camera)
+
+		self.renderer.draw_color = prev_draw_color
+		self.renderer.target = prev_target
+
+		self.light_texture.draw()
+		self.add_light_texture.draw()

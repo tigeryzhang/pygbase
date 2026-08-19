@@ -1,7 +1,5 @@
 from collections.abc import Callable
 
-import pygame
-
 from .game_state import GameState
 from .resources import Resources
 
@@ -15,6 +13,7 @@ class Loading(GameState, name="loading"):
 		# From GameState, but no parent __init__ call, so have to do it manually
 		self.id = -1
 		self._next_state = self
+		self.clear_color = (0, 0, 0)
 
 		Resources.init_load()
 
@@ -27,6 +26,3 @@ class Loading(GameState, name="loading"):
 				func()
 
 			self.set_next_state(self.after_load_state())
-
-	def draw(self, surface: pygame.Surface):
-		surface.fill((0, 0, 0))

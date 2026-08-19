@@ -3,6 +3,9 @@ import logging
 from collections.abc import Callable
 
 import pygame
+import pygame._sdl2.video as sdl_video
+
+import pygbase
 
 from .common import Common
 from .debug import Debug
@@ -10,7 +13,6 @@ from .events import Events
 from .game_state import GameState
 from .inputs.input import Input
 from .loader import Loading
-from .particles.particle import Particle
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +29,18 @@ class App:
 
 		self.title = title
 
-		# TODO: add flag handling and vsync
+		# TODO: add flag handling?
 		# ^ This is dependent partly on pygame though :/
 		self.window = pygame.Window(title, Common.get("screen_size"))
-		self.screen: pygame.Surface = self.window.get_surface()
+		self.renderer = sdl_video.Renderer(self.window, vsync=False, target_texture=True)
+		# TODO: Find a better way to get renderer and context to places
+		# Maybe part of a wider Common rewrite
+		Common.set("renderer", self.renderer)
+		Debug.init()
+
 		self.clock: pygame.time.Clock = pygame.time.Clock()
 
-		Common.set("screen", self.screen)
-
-		load_complete_runners = (Particle.cache_particle_images,) + run_on_load_complete
+		load_complete_runners = (pygbase.lighting.init_lighting_system,) + run_on_load_complete
 		self.game_state: Loading | GameState = Loading(after_load_state, load_complete_runners)
 
 		self.fixed_time_rate = 1 / fixed_time_fps
@@ -56,7 +61,12 @@ class App:
 		self.game_state.fixed_update(self.fixed_time_rate)
 
 	def draw(self):
-		self.game_state.draw(self.screen)
+		prev_color = self.renderer.draw_color
+		self.renderer.draw_color = self.game_state.clear_color
+		self.renderer.clear()
+		self.renderer.draw_color = prev_color
+
+		self.game_state.draw()
 
 	def switch_state(self):
 		next_state = self.game_state.get_next_state()
@@ -92,8 +102,8 @@ class App:
 			Debug.update_timing_text(delta, round(self.clock.get_fps()))
 
 			self.draw()
-			Debug.draw(self.screen)
-			self.window.flip()
+			Debug.draw()
+			self.renderer.present()
 
 			# Events
 			self.handle_events()

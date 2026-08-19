@@ -1,12 +1,14 @@
-import pygame
+import pygame._sdl2.video as sdl_video
 
 import pygbase
+from pygbase.common import Common
 from pygbase.ui import *
 
 
 class Tweens(pygbase.GameState, name="tweens"):
 	def __init__(self):
-		super().__init__()
+		super().__init__(clear_color=(20, 20, 20))
+		self.renderer: sdl_video.Renderer = Common.get("renderer")
 
 		from .menu import Menu
 
@@ -44,29 +46,33 @@ class Tweens(pygbase.GameState, name="tweens"):
 			if tween.value() == self.tween_values[-1]:
 				tween.progress = 0
 
-	def draw(self, surface: pygame.Surface):
-		surface.fill((20, 20, 20))
-
+	def draw(self):
+		prev_draw_color = self.renderer.draw_color
 		for tween_value in self.tween_values:
-			pygame.draw.line(
-				surface,
-				(50, 50, 50),
+			self.renderer.draw_color = (50, 50, 50)
+			self.renderer.draw_line(
 				(40 + (800 - 120) * tween_value, 100),
 				(40 + (800 - 120) * tween_value, 700),
 			)
 
 		for index, tween in enumerate(self.tweens):
-			pygame.draw.line(
-				surface,
-				"light blue",
+			self.renderer.draw_color = "light blue"
+			self.renderer.draw_line(
 				(40, 150 + 50 * index),
 				(800 - 80, 150 + 50 * index),
 			)
-			pygame.draw.circle(
-				surface,
-				"yellow",
-				(40 + (800 - 120) * tween.value(), 150 + 50 * index),
-				5,
-			)
 
-		self.ui.draw(surface)
+			# TODO: How big is a point? Need some way to draw circles
+			self.renderer.draw_color = "yellow"
+			self.renderer.fill_rect(
+				(
+					(
+						40 + (800 - 120) * tween.value() - 5,
+						150 + 50 * index - 5,
+					),
+					(10, 10),
+				),
+			)
+		self.renderer.draw_color = prev_draw_color
+
+		self.ui.draw()

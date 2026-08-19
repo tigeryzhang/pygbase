@@ -1,12 +1,16 @@
 import pygame
+import pygame._sdl2.video as sdl_video
 
 import pygbase
+from pygbase.common import Common
 from pygbase.ui import *
 
 
 class ParticlePlayground(pygbase.GameState, name="particles"):
 	def __init__(self):
-		super().__init__()
+		super().__init__(clear_color=(20, 20, 20))
+
+		self.renderer: sdl_video.Renderer = Common.get("renderer")
 
 		from .menu import Menu
 
@@ -69,10 +73,12 @@ class ParticlePlayground(pygbase.GameState, name="particles"):
 		if not pygbase.Input.mouse_pressed(1) and pygbase.Input.key_just_pressed(pygame.K_SPACE):
 			self.camera_controller.camera.set_pos(self.camera_start_pos)
 
-	def draw(self, surface: pygame.Surface):
-		surface.fill((20, 20, 20))
+	def draw(self):
+		self.particle_manager.draw(self.camera_controller.camera)
 
-		self.particle_manager.draw(surface, self.camera_controller.camera)
+		prev_draw_color = self.renderer.draw_color
+		self.renderer.draw_color = "yellow"
+		self.renderer.draw_point(self.camera_controller.camera.world_to_screen((0, 0)))
+		self.renderer.draw_color = prev_draw_color
 
-		pygame.draw.circle(surface, "yellow", self.camera_controller.camera.world_to_screen((0, 0)), 5)
-		self.ui.draw(surface)
+		self.ui.draw()

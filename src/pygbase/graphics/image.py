@@ -1,100 +1,75 @@
-import logging
-import math
+from typing import Literal
 
 import pygame
+import pygame._sdl2.video as sdl_video
 
 from ..common import Common
-
-logger = logging.getLogger(__name__)
 
 
 class Image:
 	def __init__(
 		self,
-		image: str | pygame.Surface,
-		scale: float | tuple[float, float],
-		rotatable: bool,
-		scale_by: bool = True,
+		image: str | pygame.Surface | sdl_video.Texture,
+		src_rect: pygame.Rect | None = None,
+		scale: float = 1,
 	):
 		if isinstance(image, str):
-			image: pygame.Surface = pygame.image.load(image).convert_alpha()
+			image = pygame.image.load(image)
 
-		if scale_by:
-			self.image = pygame.transform.scale_by(image, scale).convert_alpha()
+		if isinstance(image, sdl_video.Texture):
+			self._texture = image
 		else:
-			if isinstance(scale, int | float):
-				raise TypeError("`scale` needs to be (float, float) when not using scale_by")
-			self.image = pygame.transform.scale(image, scale).convert_alpha()
+			self._texture = sdl_video.Texture.from_surface(
+				Common.get("renderer"),
+				image,
+			)
 
-		self.rotatable = rotatable
+		self.src_rect = src_rect
+		self.scale = scale
 
-		self.rotate_angle = Common.get("rotate_resolution")
-		self.angled_images = []
+	@property
+	def width(self) -> int:
+		return int(self._texture.width * self.scale)
 
-		if rotatable:
-			self._generate_rotations()
+	@property
+	def height(self) -> int:
+		return int(self._texture.height * self.scale)
 
-	def _generate_rotations(self):
-		self.angled_images.clear()
-
-		num_rotations = math.ceil(360 / self.rotate_angle)
-		current_angle: float = 0.0
-		for angle in range(num_rotations):
-			self.angled_images.append(pygame.transform.rotate(self.image, current_angle).convert_alpha())
-			current_angle += self.rotate_angle
-
-	def scale(self, scale: tuple[float, float]) -> Image:
-		return Image(self.image, scale, self.rotatable, scale_by=False)
-
-	def scale_by(self, scale: tuple[float, float]) -> Image:
-		return Image(self.image, scale, self.rotatable, scale_by=True)
-
-	def get_image(self, angle: float = 0) -> pygame.Surface:
-		if angle != 0:
-			return self._get_angled_image(angle)
-		else:
-			return self.image
-
-	def _get_angled_image(self, angle: float):
-		if not self.rotatable:
-			logger.error("Non-zero values of rotation not allowed for non-rotatable image")
-			raise ValueError("Non-zero values of rotation not allowed for non-rotatable image")
-
-		angle %= 360
-
-		image_index = int(angle / self.rotate_angle)
-		image_index = min(max(image_index, 0), len(self.angled_images) - 1)
-		return self.angled_images[image_index]
+	def set_blend_mode(self, blend_mode: int):
+		self._texture.blend_mode = blend_mode
 
 	def draw(
 		self,
-		surface: pygame.Surface,
 		pos: pygame.Vector2 | tuple[float, float],
+		scale: float | tuple[int, int] | None = None,
 		angle: float = 0,
-		pivot_point: tuple[float, float] = (0, 0),
+		pivot_point: tuple[int, int] = (0, 0),  # TODO: Consider adjusting with scale
 		flip: tuple[bool, bool] = (False, False),
-		draw_pos: str = "topleft",
-		flags: int = 0,
+		draw_pos: Literal["topleft", "center", "midbottom"] | None = None,
 	):
-		factor = -1 if flip[0] ^ flip[1] else 1  # Exclusive or
-		image = self.get_image(angle * factor)
+		if scale is None:
+			scale = self.scale
 
-		if flip[0] or flip[1]:
-			image = pygame.transform.flip(image, *flip)
+		if isinstance(scale, float | int):
+			scale = (int(self._texture.width * scale), int(self._texture.height * scale))
 
-		origin = self.get_image()
-		if draw_pos == "topleft":
-			center = origin.get_rect(topleft=pos).center
-		elif draw_pos == "center":
-			center = origin.get_rect(center=pos).center
-		elif draw_pos == "midbottom":
-			center = origin.get_rect(midbottom=pos).center
-		elif draw_pos == "none":
-			center = image.get_rect(topleft=pos).center
-		else:
-			raise ValueError(f"{draw_pos} not a valid position.")
+		rect = pygame.Rect(pos, scale)
 
-		rect = image.get_rect(center=center)
-		offset = (-pygame.Vector2(pivot_point)).rotate(-angle) + pivot_point
-		rect.center = offset + center
-		surface.blit(image, rect, special_flags=flags)
+		if draw_pos is not None:
+			if draw_pos == "topleft":
+				rect.topleft = pos
+			elif draw_pos == "center":
+				rect.center = pos
+			elif draw_pos == "midbottom":
+				rect.midbottom = pos
+			else:
+				raise ValueError(f"{draw_pos} not a valid position.")
+
+		self._texture.draw(
+			srcrect=self.src_rect,
+			dstrect=rect,
+			angle=angle,
+			origin=pivot_point,
+			flip_x=flip[0],
+			flip_y=flip[1],
+		)

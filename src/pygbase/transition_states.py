@@ -1,4 +1,5 @@
 import pygame
+import pygame._sdl2.video as sdl_video
 
 from . import Common
 from .game_state import GameState
@@ -13,9 +14,6 @@ class Transition(GameState, name="transition"):
 		self.to_state = to_state
 
 	def update(self, delta: float):
-		pass
-
-	def draw(self, surface: pygame.Surface):
 		pass
 
 
@@ -36,13 +34,18 @@ class FadeTransition(Transition, name="fade_transition"):
 		self.fade_amount = 0
 		self.fade_in = True
 
-		self.fade_surface = pygame.Surface(
+		fade_surface = pygame.Surface(
 			(Common.get("screen_width"), Common.get("screen_height")),
 			flags=pygame.SRCALPHA,
 		)
+		fade_surface.fill(self.fade_colour)
+		self.fade_texture = sdl_video.Texture.from_surface(
+			Common.get("renderer"),
+			fade_surface,
+		)
 
 	def update(self, delta: float):
-		self.fade_surface.fill((*self.fade_colour, self.fade_amount))
+		self.fade_texture.alpha = self.fade_amount
 
 		if self.fade_in:
 			self.fade_amount += 255 / (self.transition_time / 2) * delta
@@ -58,9 +61,10 @@ class FadeTransition(Transition, name="fade_transition"):
 
 			self.to_state.update(delta)
 
-	def draw(self, surface: pygame.Surface):
+	def draw(self):
 		if self.fade_in:
-			self.current_state.draw(surface)
+			self.current_state.draw()
 		else:
-			self.to_state.draw(surface)
-		surface.blit(self.fade_surface, (0, 0))
+			self.to_state.draw()
+
+		self.fade_texture.draw()

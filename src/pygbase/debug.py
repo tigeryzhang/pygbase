@@ -1,20 +1,26 @@
+from typing import Literal
+
 import pygame
+import pygame._sdl2.video as sdl_video
 
 from .common import Common
 
 
+# TODO: Switch away from static class
 class Debug:
 	_active: bool = False
 
-	_debug_surface: pygame.Surface
+	_renderer: sdl_video.Renderer
+
+	_debug_operations: list[tuple[Literal["rect", "circle", "line"], *tuple]] = []
 
 	_show_timing_debug: bool = False
 	_timing_font: pygame.font.Font
 	_timing_surf: pygame.Surface
 
 	@classmethod
-	def init(cls) -> None:
-		cls._debug_surface = pygame.Surface(Common.get("screen_size"), flags=pygame.SRCALPHA)
+	def init(cls):
+		cls._renderer = Common.get("renderer")
 		cls._timing_font: pygame.font.Font = pygame.font.SysFont("arial", 30)
 
 	@classmethod
@@ -50,8 +56,7 @@ class Debug:
 		"""
 		Called at the beginning of a frame to clear the debug surface
 		"""
-		if cls._active:
-			cls._debug_surface.fill((0, 0, 0, 0))
+		cls._debug_operations.clear()
 
 	@classmethod
 	def update_timing_text(
@@ -70,7 +75,7 @@ class Debug:
 		width: int = 1,
 	):
 		if cls._active:
-			pygame.draw.rect(cls._debug_surface, color, rect, width=width)
+			cls._debug_operations.append(("rect", rect, color, width))
 
 	@classmethod
 	def draw_circle(
@@ -81,7 +86,7 @@ class Debug:
 		width: int = 1,
 	):
 		if cls._active:
-			pygame.draw.circle(cls._debug_surface, color, center, radius, width=width)
+			cls._debug_operations.append(("circle", center, radius, color, width))
 
 	@classmethod
 	def draw_line(
@@ -92,16 +97,28 @@ class Debug:
 		width: int = 1,
 	):
 		if cls._active:
-			pygame.draw.line(cls._debug_surface, color, start, end, width=width)
+			cls._debug_operations.append(("line", start, end, color, width))
 
 	@classmethod
-	def draw(cls, surface: pygame.Surface) -> None:
+	def draw(cls) -> None:
 		"""
 		Called at end of frame on top of everything
 		"""
+		# TODO: Add support for line width
 		if cls._active:
-			surface.blit(cls._debug_surface, (0, 0))
+			for operation in cls._debug_operations:
+				if operation[0] == "rect":
+					cls._renderer.draw_color = operation[2]
+					cls._renderer.draw_rect(operation[1])
+				elif operation[0] == "line":
+					cls._renderer.draw_blend_mode = operation[3]
+					cls._renderer.draw_line(operation[1], operation[2])
+				elif operation[0] == "circle":
+					pass
+				else:
+					raise ValueError("Unsupported debug type")
 
 		if cls._show_timing_debug:
 			rect = cls._timing_surf.get_rect(topright=(Common.get("screen_width") - 20, 20))
-			surface.blit(cls._timing_surf, rect)
+			timing_texture = sdl_video.Texture.from_surface(cls._renderer, cls._timing_surf)
+			timing_texture.draw(dstrect=rect)

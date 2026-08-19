@@ -1,7 +1,7 @@
 import pygame
+import pygame._sdl2.video as sdl_video
 
-import pygbase
-
+from ..common import Common
 from .light import Light
 from .lighting_manager import LightingManager
 from .shadow import Shadow
@@ -9,77 +9,64 @@ from .shadow import Shadow
 __all__ = ["Light", "LightingManager", "Shadow"]
 
 
-def init_lighting_system(max_light_radius: int, max_shadow_radius: int, interval: int, shadow_ratio: float):
-	pygbase.Common.set("max_light_radius", max_light_radius)
-	pygbase.Common.set("lighting_radius_interval", interval)
-	pygbase.Common.set("shadow_ratio", shadow_ratio)
-
-	generate_lights(max_light_radius, interval)
-	generate_shadows(max_shadow_radius, interval, shadow_ratio)
+# TODO: Honestly the entire lighting system should probably be redesigned one day
+def init_lighting_system():
+	generate_lights(256)
+	generate_shadows(256)
 
 
-def generate_lights(max_radius: int, interval: int, power: float = 1.4):
-	lights = Light.cached_lights
+def generate_lights(radius: int, power: float = 1.4):
+	resolution = radius * 2
 
-	# Create largest light surface
-	max_light_surf = pygame.Surface((max_radius * 2, max_radius * 2), flags=pygame.SRCALPHA)
-	for inner in range(max_radius, 0, -1):
-		factor = 1 - (inner / max_radius) ** power
+	light_texture = sdl_video.Texture(
+		Common.get("renderer"),
+		(
+			resolution,
+			resolution,
+		),
+	)
+	light_texture.blend_mode = pygame.BLENDMODE_ADD
+
+	light_surf = pygame.Surface((resolution, resolution), flags=pygame.SRCALPHA)
+	for inner in range(radius, 0, -1):
+		factor = 1 - (inner / radius) ** power
 		colour = int(255 * factor)
 
 		pygame.draw.circle(
-			max_light_surf,
+			light_surf,
 			(colour, colour, colour, colour),
-			(max_radius, max_radius),
+			(radius, radius),
 			inner,
 		)
 
-	lights.append(max_light_surf)
-
-	# Generate the rest based on max (and shrink the reference every so often for performance)
-	reference_surface = max_light_surf
-	for radius in range(max_radius - 1, 0, -interval):
-		new_light_surf = pygame.transform.smoothscale(reference_surface, (radius * 2, radius * 2))
-		lights.append(new_light_surf)
-
-		if radius <= int((reference_surface.get_width() * 0.75) / 2):
-			reference_surface = new_light_surf
-
-	lights.reverse()
+	light_texture.update(light_surf)
+	Light.light_texture = light_texture
 
 
-def generate_shadows(max_radius: int, interval: int, shadow_ratio: float, power: float = 3):
-	shadows = Shadow.cached_shadows
+def generate_shadows(radius: int, power: float = 3):
+	resolution = radius * 2
+
+	shadow_texture = sdl_video.Texture(
+		Common.get("renderer"),
+		(
+			resolution,
+			resolution,
+		),
+	)
+	shadow_texture.blend_mode = pygame.BLENDMODE_ADD
 
 	# Create the largest shadow surface
-	max_shadow_surf = pygame.Surface((max_radius * 2, max_radius * 2), flags=pygame.SRCALPHA)
-	for inner in range(max_radius, 0, -1):
-		factor = 1 - (inner / max_radius) ** power
+	shadow_surf = pygame.Surface((resolution, resolution), flags=pygame.SRCALPHA)
+	for inner in range(radius, 0, -1):
+		factor = 1 - (inner / radius) ** power
 		colour = int(255 * factor)
 
 		pygame.draw.circle(
-			max_shadow_surf,
+			shadow_surf,
 			(colour, colour, colour, colour),
-			(max_radius, max_radius),
+			(radius, radius),
 			inner,
 		)
 
-	shadows.append(
-		pygame.transform.smoothscale(
-			max_shadow_surf,
-			(2 * max_radius * shadow_ratio, 2 * max_radius / shadow_ratio),
-		)
-	)
-
-	# Generate the rest based on max (and shrink the reference every so often for performance)
-	reference_surface = max_shadow_surf
-	for radius in range(max_radius - 1, 0, -interval):
-		new_shadow_surf = pygame.transform.smoothscale(reference_surface, (radius * 2, radius * 2))
-		shadows.append(
-			pygame.transform.smoothscale(new_shadow_surf, (2 * radius * shadow_ratio, 2 * radius / shadow_ratio))
-		)
-
-		if radius <= int((reference_surface.get_width() * 0.75) / 2):
-			reference_surface = new_shadow_surf
-
-	shadows.reverse()
+	shadow_texture.update(shadow_surf)
+	Shadow.shadow_texture = shadow_texture

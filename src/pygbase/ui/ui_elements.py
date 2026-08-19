@@ -1,8 +1,12 @@
 from collections.abc import Callable
 
 import pygame
+import pygame._sdl2.video as sdl_video
+
+from pygbase.common import Common
 
 from .. import Resources
+from ..graphics import Image as _Image
 from .ui_element import Frame
 from .values import Fit, Grow, Layout, Padding, UIActionTriggers, XAlign, YAlign
 
@@ -22,7 +26,7 @@ class Text(Frame):
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
-		bg_color: pygame.typing.ColorLike = (0, 0, 0, 0),
+		bg_color: pygame.typing.ColorLike | None = None,
 		can_interact: bool = False,
 		blocks_mouse: bool = False,
 	):
@@ -45,6 +49,8 @@ class Text(Frame):
 
 		self.font = pygame.font.SysFont("arial", font_size)
 		self._text_surface = None
+
+		self._renderer = Common.get("renderer")
 
 		self.set_text(text)
 
@@ -70,9 +76,11 @@ class Text(Frame):
 
 		super()._wrap_text()
 
-	def _draw_self(self, surface: pygame.Surface):
+	def _draw_self(self):
 		if self._text_surface is not None:
-			surface.blit(self._text_surface, self._draw_pos)
+			# TODO: Make much more efficient please
+			texture = sdl_video.Texture.from_surface(self._renderer, self._text_surface)
+			texture.draw(dstrect=(self._draw_pos, self._text_surface.size))
 
 
 class Image(Frame):
@@ -88,7 +96,7 @@ class Image(Frame):
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
-		bg_color: pygame.typing.ColorLike = (0, 0, 0, 0),
+		bg_color: pygame.typing.ColorLike | None = None,
 		can_interact: bool = False,
 		blocks_mouse: bool = False,
 	):
@@ -110,8 +118,6 @@ class Image(Frame):
 			blocks_mouse,
 		)
 
-		self.image = image
-
 		if isinstance(image, str):
 			split_image = image.split("/")
 			if len(split_image) != 2:
@@ -119,32 +125,21 @@ class Image(Frame):
 
 			resource_name, image_name = split_image[0], split_image[1]
 
-			self._raw_image_surface: pygame.Surface = Resources.get_resource(resource_name, image_name).get_image()
-
-			if self._raw_image_surface.get_height() == 0:
-				raise ValueError("Image height is zero; cannot compute aspect ratio.")
-			self._aspect_ratio = self._raw_image_surface.get_width() / self._raw_image_surface.get_height()
-
-			self._image_surface = self._raw_image_surface.copy()
-			self._size.update(
-				self._raw_image_surface.get_width(),
-				self._raw_image_surface.get_height(),
-			)
+			self._image: _Image = Resources.get_resource(resource_name, image_name)
 		elif isinstance(image, pygame.Surface):
-			self._raw_image_surface: pygame.Surface = image
-
-			self._aspect_ratio = self._raw_image_surface.get_width() / self._raw_image_surface.get_height()
-
-			self._image_surface = self._raw_image_surface.copy()
-			self._size.update(
-				self._raw_image_surface.get_width(),
-				self._raw_image_surface.get_height(),
-			)
+			self._image = _Image(image)
 		else:
-			raise TypeError(f"Type of image: `{type(image)}` is not str or Surface")
+			raise TypeError(f"Type of image: `{type(image)}` is not supported")
+
+		self._aspect_ratio = self._image.width / self._image.height
+
+		self._size.update(
+			self._image.width,
+			self._image.height,
+		)
 
 	def _fix_aspect_ratio(self):
-		if self.image is not None:
+		if self._image is not None:
 			if isinstance(self.size_settings[0], Fit):
 				# print("Fixed X:", self.min_width, self.width, self._iter_min_size.x)
 
@@ -176,10 +171,8 @@ class Image(Frame):
 
 		self._fix_aspect_ratio()
 
-	def _draw_self(self, surface: pygame.Surface):
-		if self.image is not None and self.size != pygame.Vector2(self._image_surface.get_size()):
-			self._image_surface = pygame.transform.scale(self._raw_image_surface, (int(self.width), int(self.height)))
-		surface.blit(self._image_surface, self._draw_pos)
+	def _draw_self(self):
+		self._image.draw(self._draw_pos, scale=(int(self.width), int(self.height)))
 
 
 class Button(Frame):
@@ -196,7 +189,7 @@ class Button(Frame):
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
-		bg_color: pygame.typing.ColorLike = (0, 0, 0, 0),
+		bg_color: pygame.typing.ColorLike | None = None,
 		can_interact: bool = True,
 		blocks_mouse: bool = True,
 	):
@@ -215,11 +208,17 @@ class Button(Frame):
 
 		self.add_action(UIActionTriggers.ON_CLICK_UP, callback, action_args=callback_args)
 
-	def _draw_overlay(self, surface: pygame.Surface):
-		if self._hovered:
-			surface.fill((20, 20, 20), special_flags=pygame.BLEND_ADD)
-		if self._clicked:
-			surface.fill((20, 20, 20), special_flags=pygame.BLEND_ADD)
+	def _draw_overlay(self):
+		if self._hovered or self._clicked:
+			prev_blend_mode = self._renderer.draw_blend_mode
+			self._renderer.draw_blend_mode = pygame.BLENDMODE_ADD
+
+			prev_draw_color = self._renderer.draw_color
+			self._renderer.draw_color = (20, 20, 20)
+			self._renderer.fill_rect((self._draw_pos, self.size))
+			self._renderer.draw_color = prev_draw_color
+
+			self._renderer.draw_blend_mode = prev_blend_mode
 
 
 class TextSelector(Frame):
@@ -237,7 +236,7 @@ class TextSelector(Frame):
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
-		bg_color: pygame.typing.ColorLike = (0, 0, 0, 0),
+		bg_color: pygame.typing.ColorLike | None = None,
 		can_interact: bool = False,
 		blocks_mouse: bool = False,
 	):
@@ -258,13 +257,13 @@ class TextSelector(Frame):
 		self.options = options
 
 		with self:
-			with Button(self._left_callback, size=(Fit(), Grow()), bg_color="blue"):
+			with Button(self._left_callback, size=(Fit(), Grow())):
 				Image(left_button_image, size=(Fit(), Grow()))
 
 			with Frame(size=(Grow(), Grow()), x_align=XAlign.CENTER, y_align=YAlign.CENTER):
 				self._text_element = Text(self.text, 30, "white")
 
-			with Button(self._right_callback, size=(Fit(), Grow()), bg_color="yellow"):
+			with Button(self._right_callback, size=(Fit(), Grow())):
 				Image(right_button_image, size=(Fit(), Grow()))
 
 	@property
@@ -296,7 +295,7 @@ class ProgressBar(Frame):
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
-		bg_color: pygame.typing.ColorLike = (0, 0, 0, 0),
+		bg_color: pygame.typing.ColorLike | None = None,
 		can_interact: bool = False,
 		blocks_mouse: bool = False,
 	):
@@ -319,7 +318,7 @@ class ProgressBar(Frame):
 	def set_fill(self, percent: float):
 		self._fill_percent = percent
 
-	def _draw_self(self, surface: pygame.Surface):
+	def _draw_self(self):
 		fill_rect = pygame.Rect(
 			self._draw_pos.x + self.padding.left,
 			self._draw_pos.y + self.padding.top,
@@ -327,4 +326,7 @@ class ProgressBar(Frame):
 			self.size.y - self.padding.top - self.padding.bottom,
 		)
 
-		pygame.draw.rect(surface, self._color, fill_rect)
+		prev_draw_color = self._renderer.draw_color
+		self._renderer.draw_color = self._color
+		self._renderer.fill_rect(fill_rect)
+		self._renderer.draw_color = prev_draw_color

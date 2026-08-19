@@ -6,7 +6,7 @@ from pygbase.ui import *
 
 class Menu(pygbase.GameState, name="menu"):
 	def __init__(self):
-		super().__init__()
+		super().__init__(clear_color=(20, 20, 20))
 
 		from .dialogue_testing import DialogueTesting
 		from .particle_playground import ParticlePlayground
@@ -121,10 +121,18 @@ class Menu(pygbase.GameState, name="menu"):
 
 		self.left_image: pygbase.Image = pygbase.Resources.get_resource("image", "left")
 
+		self.lighting = pygbase.LightingManager(0.7, 0.1)
+		self.mouse_light = self.lighting.add_light(
+			pygbase.Light((0, 0), 0.9, 200, 30, 0.5),
+		)
+
 	def update(self, delta: float):
 		self.ui.update(delta)
+		self.lighting.update(delta)
 
 		self.progress_bar.set_fill(int(self.selector.text) / 9)
+
+		self.mouse_light.update_pos(pygame.mouse.get_pos())
 
 		# if pygbase.Input.key_just_pressed(pygame.K_SPACE):
 		# 	self.button_frame.ui_pos = (
@@ -144,14 +152,12 @@ class Menu(pygbase.GameState, name="menu"):
 		if pygbase.Input.key_just_pressed(pygame.K_ESCAPE):
 			pygbase.Events.post_event(pygame.QUIT)
 
-	def draw(self, surface: pygame.Surface):
-		surface.fill((20, 20, 20))
+	def draw(self):
+		self.left_image.draw((400, 400), angle=20, flip=(False, False))
+		self.left_image.draw((400, 500), angle=20, flip=(True, False))
+		self.left_image.draw((400, 600), angle=20, flip=(False, True))
+		self.left_image.draw((400, 700), angle=20, flip=(True, True))
 
-		# sys.exit()
+		self.ui.draw()
 
-		self.left_image.draw(surface, (400, 400), 20, flip=(False, False))
-		self.left_image.draw(surface, (400, 500), 20, flip=(True, False))
-		self.left_image.draw(surface, (400, 600), 20, flip=(False, True))
-		self.left_image.draw(surface, (400, 700), 20, flip=(True, True))
-
-		self.ui.draw(surface)
+		self.lighting.draw_lights()

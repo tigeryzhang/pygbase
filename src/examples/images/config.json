@@ -1,14 +1,11 @@
 {
   "button": {
-    "rotatable": false,
     "scale": 1
   },
   "left": {
-    "rotatable": true,
-    "scale": 5
+    "scale": 0
   },
   "right": {
-    "rotatable": false,
-    "scale": 5
+    "scale": 0
   }
 }

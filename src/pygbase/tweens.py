@@ -46,18 +46,12 @@ class Tween(abc.ABC):
 
 
 class LinearTween(Tween):
-	def __init__(self, values: tuple[float, ...], time: float):
-		super().__init__(values, time)
-
 	def value(self) -> float:
 		current_value, next_value, progress_to_next = self._get_current_next_progress_values()
 		return current_value + (next_value - current_value) * progress_to_next
 
 
 class CubicTween(Tween):
-	def __init__(self, values: tuple[float, ...], time: float):
-		super().__init__(values, time)
-
 	@staticmethod
 	def _cubic_ease(progress) -> float:
 		if progress < 0.5:

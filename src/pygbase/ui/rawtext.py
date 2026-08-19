@@ -1,6 +1,9 @@
 import enum
 
 import pygame
+import pygame._sdl2.video as sdl_video
+
+from pygbase.common import Common
 
 from ..debug import Debug
 
@@ -105,7 +108,9 @@ class RawText:
 		self.overflow_behaviour = overflow_behaviour
 		self.max_width = max_width
 
-		self.rendered_text: pygame.Surface
+		self.renderer: sdl_video.Renderer = Common.get("renderer")
+		self.rendered_text_surface: pygame.Surface
+		self.rendered_text_texture: sdl_video.Texture | None
 		self.text_rect: pygame.Rect
 		self._render_text()
 
@@ -115,23 +120,34 @@ class RawText:
 
 	def _render_text(self):
 		if self.overflow_behaviour == TextOverflowBehaviour.WRAP:
-			self.rendered_text = self.font.render(
-				self.text, True, self.colour, wraplength=self.max_width
-			).convert_alpha()
+			self.rendered_text_surface = self.font.render(self.text, True, self.colour, wraplength=self.max_width)
 		elif self.overflow_behaviour == TextOverflowBehaviour.SHRINK:
-			self.rendered_text = self.font.render(self.text, True, self.colour).convert_alpha()
+			self.rendered_text_surface = self.font.render(
+				self.text,
+				True,
+				self.colour,
+			)
 
+			# TODO: Rework to avoid needing to scale image on cpu
+			#  Probably need to tie in with self.reposition
 			# Scale down to fit surface
-			if self.max_width != 0 and self.rendered_text.get_width() > self.max_width:
-				ratio = self.max_width / self.rendered_text.get_width()
-				self.rendered_text = pygame.transform.smoothscale_by(self.rendered_text, ratio)
+			if self.max_width != 0 and self.rendered_text_surface.get_width() > self.max_width:
+				ratio = self.max_width / self.rendered_text_surface.get_width()
+				self.rendered_text_surface = pygame.transform.smoothscale_by(self.rendered_text_surface, ratio)
+
+		if self.rendered_text_surface.width != 0 and self.rendered_text_surface.height != 0:
+			self.rendered_text_texture = sdl_video.Texture.from_surface(
+				self.renderer,
+				self.rendered_text_surface,
+			)
 
 		self.reposition()
 
 	def reposition(self):
-		self.text_rect = self.rendered_text.get_rect()
+		self.text_rect = self.rendered_text_surface.get_rect()
 		UIAlignment.set_rect(self.text_rect, self.alignment, self.pos)
 
-	def draw(self, surface: pygame.Surface) -> None:
-		surface.blit(self.rendered_text, self.text_rect)
+	def draw(self) -> None:
+		if self.rendered_text_texture is not None:
+			self.rendered_text_texture.draw(dstrect=self.text_rect)
 		Debug.draw_rect(self.text_rect, "yellow")

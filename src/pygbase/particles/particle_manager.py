@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING
 
 import pygame
+import pygame._sdl2.video as sdl_video
+
+from pygbase.common import Common
 
 from ..camera import Camera
 from ..debug import Debug
@@ -24,6 +27,8 @@ class ParticleManager:
 		self.chunked_colliders: dict[tuple[int, int], list[pygame.Rect]] = {}
 		self.generate_chunked_colliders(colliders)
 		self.dynamic_colliders: list[pygame.Rect] = []
+
+		self.renderer: sdl_video.Renderer = Common.get("renderer")
 
 	def generate_chunked_colliders(self, colliders):
 		chunked_colliders = {}
@@ -144,8 +149,18 @@ class ParticleManager:
 			self.particles.setdefault(chunk_pos, []).append(particle)
 			particle.has_moved_chunk = False
 
-	def draw(self, surface: pygame.Surface, camera: Camera):
-		surface.fblits([particle.get_blit_pair(camera) for chunk in self.particles.values() for particle in chunk])
+	def draw(self, camera: Camera):
+		for chunk in self.particles.values():
+			for particle in chunk:
+				prev_draw_color = self.renderer.draw_color
+				self.renderer.draw_color = particle.color
+				self.renderer.fill_rect(
+					(
+						camera.world_to_screen(particle.pos - pygame.Vector2(particle.size / 2)),
+						(particle.size, particle.size),
+					)
+				)
+				self.renderer.draw_color = prev_draw_color
 
 		# Debug
 		if Debug.is_active():

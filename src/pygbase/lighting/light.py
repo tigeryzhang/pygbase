@@ -1,13 +1,13 @@
 import math
 
 import pygame
+import pygame._sdl2.video as sdl_video
 
 from ..camera import Camera
-from ..common import Common
 
 
 class Light:
-	cached_lights: list[pygame.Surface] = []
+	light_texture: sdl_video.Texture
 
 	def __init__(
 		self,
@@ -36,44 +36,9 @@ class Light:
 		self.variation = variation
 		self.variation_speed = variation_speed
 
-		self.brightness_surface = pygame.Surface(
-			((self.radius + self.variation) * 2, (self.radius + self.variation) * 2),
-			flags=pygame.SRCALPHA,
-		)
-		self.brightness_surface.fill(
-			(
-				int(255 * self.brightness),
-				int(255 * self.brightness),
-				int(255 * self.brightness),
-			)
-		)
-
-		if self.add_brightness > 0:
-			self.add_brightness_surface = pygame.Surface(
-				(
-					(self.radius + self.variation) * 2,
-					(self.radius + self.variation) * 2,
-				),
-				flags=pygame.SRCALPHA,
-			)
-			self.add_brightness_surface.fill(
-				(
-					int(255 * self.add_brightness),
-					int(255 * self.add_brightness),
-					int(255 * self.add_brightness),
-				)
-			)
-
 		self.tint = tint
-		self.tint_surface = pygame.Surface(
-			((self.radius + self.variation) * 2, (self.radius + self.variation) * 2),
-			flags=pygame.SRCALPHA,
-		)
-		self.tint_surface.fill(self.tint)
 
 		self.camera_affected = camera_affected
-
-		self.radius_interval = Common.get("lighting_radius_interval")
 
 	def update_pos(self, pos):
 		if self._linked_pos:
@@ -85,68 +50,39 @@ class Light:
 		self.brightness = pygame.math.clamp(brightness, 0, 1)
 		self.add_brightness = pygame.math.clamp(brightness - 1, 0, 1)
 
-		self.brightness_surface.fill(
-			(
-				int(255 * self.brightness),
-				int(255 * self.brightness),
-				int(255 * self.brightness),
-			)
-		)
-
-		if self.add_brightness > 0:
-			self.add_brightness_surface.fill(
-				(
-					int(255 * self.add_brightness),
-					int(255 * self.add_brightness),
-					int(255 * self.add_brightness),
-				)
-			)
-
 	def update(self, delta):
 		pass
 
-	def draw(self, surface: pygame.Surface, add_surface: pygame.Surface, camera: Camera):
+	def draw_light(self, camera: Camera | None):
 		current_time = pygame.time.get_ticks() / 1000
 		variation = math.sin((current_time - self.start_time) * self.variation_speed) * self.variation
 
-		radius = int(self.radius + variation)
-		# colour = int(max(0.0, min(1.0, self.brightness + variation / 20)))
+		size = int(self.radius + variation) * 2
 
-		light_surface = self.cached_lights[int(radius / self.radius_interval) - 1].copy()
+		pos = self.pos
+		if self.camera_affected and camera is not None:
+			pos = camera.world_to_screen(pos)
 
-		light_surface.blit(self.brightness_surface, (0, 0), special_flags=pygame.BLEND_MULT)
-		light_surface.blit(self.tint_surface, (0, 0), special_flags=pygame.BLEND_MULT)
+		rect = pygame.Rect(0, 0, size, size)
+		rect.center = pos
 
-		if self.add_brightness > 0:
-			add_light_surface = self.cached_lights[int(radius / self.radius_interval) - 1].copy()
+		Light.light_texture.alpha = int(self.brightness * 255)
+		Light.light_texture.color = self.tint
+		Light.light_texture.draw(dstrect=rect)
 
-			add_light_surface.blit(self.add_brightness_surface, (0, 0), special_flags=pygame.BLEND_MULT)
-			add_light_surface.blit(self.tint_surface, (0, 0), special_flags=pygame.BLEND_MULT)
+	def draw_add_light(self, camera: Camera | None):
+		current_time = pygame.time.get_ticks() / 1000
+		variation = math.sin((current_time - self.start_time) * self.variation_speed) * self.variation
 
-		if self.camera_affected:
-			surface.blit(
-				light_surface,
-				light_surface.get_rect(center=camera.world_to_screen(self.pos)),
-				special_flags=pygame.BLEND_ADD,
-			)
+		size = int(self.radius + variation) * 2
 
-			if self.add_brightness > 0:
-				add_surface.blit(
-					add_light_surface,
-					add_light_surface.get_rect(center=camera.world_to_screen(self.pos)),
-					special_flags=pygame.BLEND_ADD,
-				)
+		pos = self.pos
+		if self.camera_affected and camera is not None:
+			pos = camera.world_to_screen(pos)
 
-		else:
-			surface.blit(
-				light_surface,
-				light_surface.get_rect(center=self.pos),
-				special_flags=pygame.BLEND_ADD,
-			)
+		rect = pygame.Rect(0, 0, size, size)
+		rect.center = pos
 
-			if self.add_brightness > 0:
-				add_surface.blit(
-					add_light_surface,
-					add_light_surface.get_rect(center=self.pos),
-					special_flags=pygame.BLEND_ADD,
-				)
+		Light.light_texture.alpha = int(self.add_brightness * 255)
+		Light.light_texture.color = self.tint
+		Light.light_texture.draw(dstrect=rect)

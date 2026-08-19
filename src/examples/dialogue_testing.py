@@ -26,13 +26,13 @@ class DialogueTesting(pygbase.GameState, name="dialogue"):
 		if pygbase.Input.key_just_pressed(pygame.K_SPACE):
 			self.dialogue_manager.set_current_node("first")
 
-	def draw(self, surface: pygame.Surface):
 		if (
 			self.dialogue_manager.has_current_node()
 			and self.dialogue_manager.nodes[self.dialogue_manager.current_node].finished_displaying
 		):
-			surface.fill((40, 40, 40))
+			self.clear_color = (40, 40, 40)
 		else:
-			surface.fill((20, 20, 20))
+			self.clear_color = (20, 20, 20)
 
-		self.dialogue_manager.draw(surface)
+	def draw(self):
+		self.dialogue_manager.draw()

@@ -1,4 +1,7 @@
 import pygame
+import pygame._sdl2.video as sdl_video
+
+from pygbase.common import Common
 
 from ..camera import Camera
 from .image import Image
@@ -15,23 +18,19 @@ class SpriteSheet:
 		self.tile_height: int = data["tile_height"] * self.scale
 
 		# Load Sprite Sheet
-		self.image: pygame.Surface = pygame.image.load(resource_path).convert_alpha()
-		self.image.set_colorkey((0, 0, 0))
-		self.image = pygame.transform.scale(
-			self.image,
-			(self.image.get_width() * self.scale, self.image.get_height() * self.scale),
+		self.texture = sdl_video.Texture.from_surface(
+			Common.get("renderer"),
+			pygame.image.load(resource_path),
 		)
 
 		# Automatically set n_rows and n_cols if needed
 		if self.n_rows == 0:
-			self.n_rows = int(self.image.get_height() / self.tile_height)
+			self.n_rows = int(self.texture.height / self.tile_height)
 		if self.n_cols == 0:
-			self.n_cols = int(self.image.get_width() / self.tile_width)
+			self.n_cols = int(self.texture.width / self.tile_width)
 
 		self._images: list[Image] = []
-
 		self._load_sprite_sheet()
-
 		self.length = len(self._images)
 
 	def _load_image(self, row, col):
@@ -41,13 +40,7 @@ class SpriteSheet:
 			self.tile_width,
 			self.tile_height,
 		)
-		# image = self.image.subsurface(rect)  # Unusable due to transparency issue
-		# image = pygame.Surface(rect.size, flags=pygame.SRCALPHA)
-		# image.blit(self.image, (0, 0), rect)
-		# print(image)
-		image = self.image.subsurface(rect)
-
-		self._images.append(Image(image, 1, self.rotatable))
+		self._images.append(Image(self.texture, src_rect=rect))
 
 	def _load_sprite_sheet(self):
 		for row in range(self.n_rows):
@@ -58,12 +51,4 @@ class SpriteSheet:
 		return self._images[index]
 
 	def draw_sheet(self, display: pygame.Surface, camera: Camera):
-		display.blit(self.image, -camera.pos)
-
-	# # TODO: Fix
-	# text = RawText((0, 0), "arial", 100, "white", use_sys=True)
-	# for row in range(self.n_rows):
-	# 	for col in range(self.n_cols):
-	# 		text.pos = (col * self.tile_width - camera.pos.x, row * self.tile_height - camera.pos.y)
-	# 		text.reposition()
-	# 		text.draw(display)
+		self.texture.draw(dstrect=(*camera.pos, self.texture.width, self.texture.height))

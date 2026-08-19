@@ -13,6 +13,7 @@ class MouseInput(enum.Enum):
 	RIGHT_CLICK = enum.auto()
 
 
+# TODO: Add PS5 dualsense
 class ControllerTypes(enum.Enum):
 	DEFAULT = enum.auto()  # Xbox 360
 	SWITCH_PRO = enum.auto()

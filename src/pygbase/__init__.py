@@ -61,10 +61,6 @@ def init(
 	Events.init()
 	Input.register_handlers()
 
-	lighting.init_lighting_system(max_light_radius, max_shadow_radius, light_radius_interval, shadow_ratio)
-
-	Debug.init()
-
 
 def add_resource_type(type_id: int, resource_type: ResourceType):
 	Common.add_resource_type(resource_type.name, type_id)
@@ -75,14 +71,21 @@ def add_resource_type(type_id: int, resource_type: ResourceType):
 def add_image_resource(name: str, type_id: int, dir_path: str, default_scale: float = 1):
 	def load_image(data: dict, resource_path: str):
 		scale = data["scale"]
-		scale = scale if scale != 0 else default_scale
-		rotatable = data["rotatable"]
-
-		return Image(resource_path, scale, rotatable)
+		return Image(
+			resource_path,
+			scale=scale or default_scale,
+		)
 
 	add_resource_type(
 		type_id,
-		ResourceType(name, dir_path, ".png", {"scale": 0, "rotatable": False}, None, load_image),
+		ResourceType(
+			name,
+			dir_path,
+			".png",
+			{"scale": 0},
+			None,
+			load_image,
+		),
 	)
 
 

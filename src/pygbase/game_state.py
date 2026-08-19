@@ -24,8 +24,9 @@ class GameState:
 
 		GameState.child_state_id += 1
 
-	def __init__(self):
+	def __init__(self, clear_color: pygame.typing.ColorLike = (0, 0, 0)):
 		self._next_state = self
+		self.clear_color = clear_color
 
 	def enter(self):
 		"""Called when entering state"""
@@ -51,5 +52,5 @@ class GameState:
 	def fixed_update(self, delta: float):
 		pass
 
-	def draw(self, surface: pygame.Surface):
+	def draw(self):
 		pass

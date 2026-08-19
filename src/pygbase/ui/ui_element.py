@@ -5,6 +5,7 @@ from types import TracebackType
 from typing import Self
 
 import pygame
+import pygame._sdl2.video as sdl_video
 
 from .. import Common, Input
 from ..debug import Debug
@@ -43,7 +44,7 @@ class Frame:
 		gap: float = 0,
 		x_align: XAlign = XAlign.LEFT,
 		y_align: YAlign = YAlign.TOP,
-		bg_color: pygame.typing.ColorLike = (0, 0, 0, 0),
+		bg_color: pygame.typing.ColorLike | None = None,
 		can_interact: bool = False,
 		blocks_mouse: bool = False,
 	):
@@ -92,7 +93,8 @@ class Frame:
 			self.parent.children.append(self)  # NoQA: Dunno why pycharm thinks this is wrong
 
 		# Surface
-		self._surface: pygame.Surface | None = None
+		self._renderer: sdl_video.Renderer = Common.get("renderer")
+		self._texture: sdl_video.Texture | None = None
 
 		# UI actions
 		self._time: float = 0  # TODO: Use multiple times for different actions?
@@ -136,7 +138,7 @@ class Frame:
 	@property
 	def _draw_pos(self):
 		if self.parent is not None:
-			return self._resolved_pos - self.parent._resolved_pos
+			return self._resolved_pos
 		else:
 			return self.pos
 
@@ -739,26 +741,30 @@ class Frame:
 
 				self._time = 0
 
-	def _draw_self(self, surface: pygame.Surface):
+	def _draw_self(self):
 		"""Drawn on parent – used to draw self"""
 
-	def _draw_overlay(self, surface: pygame.Surface):
+	def _draw_overlay(self):
 		"""Drawn on self – used to draw on top of self (and children)"""
 
-	def draw(self, surface: pygame.Surface):
-		if self._surface is None or self.size != self._surface.size:
-			self._surface = pygame.Surface(self.size, flags=pygame.SRCALPHA)
+	def draw(self):
+		if self.background_color is not None:
+			prev_blend_mode = self._renderer.draw_blend_mode
+			self._renderer.draw_blend_mode = pygame.BLENDMODE_BLEND
 
-		self._surface.fill(self.background_color)
+			prev_draw_color = self._renderer.draw_color
+			self._renderer.draw_color = self.background_color
+			self._renderer.fill_rect((self._draw_pos, (self.width, self.height)))
+			self._renderer.draw_color = prev_draw_color
 
-		self._draw_self(surface)
+			self._renderer.draw_blend_mode = prev_blend_mode
+
+		self._draw_self()
 
 		# Debug Outline
 		Debug.draw_rect(self.rect, "white", width=1)
 
 		for child in self.children:
-			child.draw(self._surface)
+			child.draw()
 
-		self._draw_overlay(self._surface)
-
-		surface.blit(self._surface, self._draw_pos)
+		self._draw_overlay()

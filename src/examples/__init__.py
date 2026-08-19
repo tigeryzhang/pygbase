@@ -24,7 +24,12 @@ def main():
 	# pygbase.Debug.show()
 	pygbase.Debug.show_fps()
 
-	pygbase.add_image_resource("image", 1, str(CURRENT_DIR / "images"))
+	pygbase.add_image_resource(
+		"image",
+		1,
+		str(CURRENT_DIR / "images"),
+		default_scale=5,
+	)
 
 	pygbase.add_particle_setting(
 		"test",
@@ -54,9 +59,7 @@ def main():
 	pygbase.Events.add_handler("all", pygame.KEYDOWN, handler=toggle_debug)
 
 	pygbase.Events.create_custom_event("test")
-
 	pygbase.Events.add_handler("all", "test", lambda e: logger.info("Received Test Event"))
-
 	pygbase.Events.post_event("test")
 
 	app = pygbase.App(Menu)

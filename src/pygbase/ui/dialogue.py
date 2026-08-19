@@ -78,9 +78,9 @@ class DialogueNode:
 		else:
 			self.just_finished_displaying = False
 
-	def draw(self, surface: pygame.Surface):
+	def draw(self):
 		for text in self.texts:
-			text.draw(surface)
+			text.draw()
 
 
 class DialogueOption:
@@ -223,9 +223,9 @@ class DialogueManager:
 				if self.get_current_node().just_finished_displaying:
 					self._make_ui()
 
-	def draw(self, surface: pygame.Surface):
+	def draw(self):
 		if self.has_current_node():
 			assert self.ui is not None
-			self.ui.draw(surface)
+			self.ui.draw()
 
-			self.get_current_node().draw(surface)
+			self.get_current_node().draw()
