@@ -3,7 +3,6 @@ import logging
 from collections.abc import Callable
 
 import pygame
-import pygame._sdl2.video as sdl_video
 
 import pygbase
 
@@ -13,6 +12,7 @@ from .events import Events
 from .game_state import GameState
 from .inputs.input import Input
 from .loader import Loading
+from .renderer import Renderer
 
 logger = logging.getLogger(__name__)
 
@@ -32,10 +32,9 @@ class App:
 		# TODO: add flag handling?
 		# ^ This is dependent partly on pygame though :/
 		self.window = pygame.Window(title, Common.get("screen_size"))
-		self.renderer = sdl_video.Renderer(self.window, vsync=False, target_texture=True)
-		# TODO: Find a better way to get renderer and context to places
-		# Maybe part of a wider Common rewrite
-		Common.set("renderer", self.renderer)
+		self.renderer = Renderer(self.window, vsync=False, target_texture=True)
+		Common.renderer = self.renderer
+
 		Debug.init()
 
 		self.clock: pygame.time.Clock = pygame.time.Clock()
@@ -47,7 +46,7 @@ class App:
 
 		Events.add_handler("all", pygame.QUIT, self.quit_handler)
 
-	def quit_handler(self, event: pygame.event.Event):
+	def quit_handler(self, _event: pygame.event.Event):
 		self.is_running = False
 
 	def handle_events(self):
@@ -61,11 +60,7 @@ class App:
 		self.game_state.fixed_update(self.fixed_time_rate)
 
 	def draw(self):
-		prev_color = self.renderer.draw_color
-		self.renderer.draw_color = self.game_state.clear_color
-		self.renderer.clear()
-		self.renderer.draw_color = prev_color
-
+		self.renderer.clear_with_color(self.game_state.clear_color)
 		self.game_state.draw()
 
 	def switch_state(self):

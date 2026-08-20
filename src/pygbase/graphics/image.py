@@ -1,26 +1,26 @@
 from typing import Literal
 
 import pygame
-import pygame._sdl2.video as sdl_video
 
+from .. import Texture
 from ..common import Common
 
 
 class Image:
 	def __init__(
 		self,
-		image: str | pygame.Surface | sdl_video.Texture,
+		image: str | pygame.Surface | Texture,
 		src_rect: pygame.Rect | None = None,
 		scale: float = 1,
 	):
 		if isinstance(image, str):
 			image = pygame.image.load(image)
 
-		if isinstance(image, sdl_video.Texture):
+		if isinstance(image, Texture):
 			self._texture = image
 		else:
-			self._texture = sdl_video.Texture.from_surface(
-				Common.get("renderer"),
+			self._texture = Texture.from_surface(
+				Common.renderer,
 				image,
 			)
 

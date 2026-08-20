@@ -1,8 +1,8 @@
 import pygame
-import pygame._sdl2.video as sdl_video
 
 from pygbase.common import Common
 
+from .. import Texture
 from ..camera import Camera
 from .image import Image
 
@@ -18,8 +18,8 @@ class SpriteSheet:
 		self.tile_height: int = data["tile_height"] * self.scale
 
 		# Load Sprite Sheet
-		self.texture = sdl_video.Texture.from_surface(
-			Common.get("renderer"),
+		self.texture = Texture.from_surface(
+			Common.renderer,
 			pygame.image.load(resource_path),
 		)
 
@@ -50,5 +50,5 @@ class SpriteSheet:
 	def get_image(self, index: int) -> Image:
 		return self._images[index]
 
-	def draw_sheet(self, display: pygame.Surface, camera: Camera):
+	def draw_sheet(self, camera: Camera):
 		self.texture.draw(dstrect=(*camera.pos, self.texture.width, self.texture.height))

@@ -1,7 +1,5 @@
 from collections.abc import Callable
 
-import pygame
-
 from ..common import Common
 from ..timer import Timer
 from .rawtext import RawText
@@ -115,7 +113,7 @@ class DialogueManager:
 
 		self.char_timer = Timer(char_timing, False, True)
 
-		self.ui = None
+		self.ui: Frame
 		self.width = None
 		self.height = None
 		self.starting_y = None
@@ -211,7 +209,6 @@ class DialogueManager:
 			self.char_timer.start()
 
 	def update(self, delta: float):
-		assert self.ui is not None
 		self.ui.update(delta)
 
 		if self.has_current_node():
@@ -225,7 +222,6 @@ class DialogueManager:
 
 	def draw(self):
 		if self.has_current_node():
-			assert self.ui is not None
 			self.ui.draw()
 
 			self.get_current_node().draw()

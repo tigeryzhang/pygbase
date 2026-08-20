@@ -1,11 +1,11 @@
 import pygame
-import pygame._sdl2.video as sdl_video
 
+from .. import Texture
 from ..camera import Camera
 
 
 class Shadow:
-	shadow_texture: sdl_video.Texture
+	shadow_texture: Texture
 
 	def __init__(self, pos: pygame.typing.Point, size: float):
 		self._linked_pos: bool

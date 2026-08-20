@@ -1,16 +1,17 @@
 from typing import Literal
 
 import pygame
-import pygame._sdl2.video as sdl_video
 
+from . import Texture
 from .common import Common
+from .renderer import Renderer
 
 
 # TODO: Switch away from static class
 class Debug:
 	_active: bool = False
 
-	_renderer: sdl_video.Renderer
+	_renderer: Renderer
 
 	_debug_operations: list[tuple[Literal["rect", "circle", "line"], *tuple]] = []
 
@@ -20,7 +21,7 @@ class Debug:
 
 	@classmethod
 	def init(cls):
-		cls._renderer = Common.get("renderer")
+		cls._renderer = Common.renderer
 		cls._timing_font: pygame.font.Font = pygame.font.SysFont("arial", 30)
 
 	@classmethod
@@ -108,11 +109,11 @@ class Debug:
 		if cls._active:
 			for operation in cls._debug_operations:
 				if operation[0] == "rect":
-					cls._renderer.draw_color = operation[2]
-					cls._renderer.draw_rect(operation[1])
+					with cls._renderer.using_draw_color(operation[2]):
+						cls._renderer.draw_rect(operation[1])
 				elif operation[0] == "line":
-					cls._renderer.draw_blend_mode = operation[3]
-					cls._renderer.draw_line(operation[1], operation[2])
+					with cls._renderer.using_draw_color(operation[3]):
+						cls._renderer.draw_line(operation[1], operation[2])
 				elif operation[0] == "circle":
 					pass
 				else:
@@ -120,5 +121,5 @@ class Debug:
 
 		if cls._show_timing_debug:
 			rect = cls._timing_surf.get_rect(topright=(Common.get("screen_width") - 20, 20))
-			timing_texture = sdl_video.Texture.from_surface(cls._renderer, cls._timing_surf)
+			timing_texture = Texture.from_surface(cls._renderer, cls._timing_surf)
 			timing_texture.draw(dstrect=rect)

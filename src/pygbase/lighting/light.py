@@ -1,13 +1,13 @@
 import math
 
 import pygame
-import pygame._sdl2.video as sdl_video
 
+from .. import Texture
 from ..camera import Camera
 
 
 class Light:
-	light_texture: sdl_video.Texture
+	light_texture: Texture
 
 	def __init__(
 		self,

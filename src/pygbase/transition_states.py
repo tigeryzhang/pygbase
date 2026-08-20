@@ -1,7 +1,7 @@
 import pygame
-import pygame._sdl2.video as sdl_video
 
-from . import Common
+from . import Texture
+from .common import Common
 from .game_state import GameState
 
 
@@ -39,8 +39,8 @@ class FadeTransition(Transition, name="fade_transition"):
 			flags=pygame.SRCALPHA,
 		)
 		fade_surface.fill(self.fade_colour)
-		self.fade_texture = sdl_video.Texture.from_surface(
-			Common.get("renderer"),
+		self.fade_texture = Texture.from_surface(
+			Common.renderer,
 			fade_surface,
 		)
 

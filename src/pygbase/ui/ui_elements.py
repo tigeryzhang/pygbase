@@ -1,11 +1,8 @@
 from collections.abc import Callable
 
 import pygame
-import pygame._sdl2.video as sdl_video
 
-from pygbase.common import Common
-
-from .. import Resources
+from .. import Resources, Texture
 from ..graphics import Image as _Image
 from .ui_element import Frame
 from .values import Fit, Grow, Layout, Padding, UIActionTriggers, XAlign, YAlign
@@ -50,8 +47,6 @@ class Text(Frame):
 		self.font = pygame.font.SysFont("arial", font_size)
 		self._text_surface = None
 
-		self._renderer = Common.get("renderer")
-
 		self.set_text(text)
 
 	def set_text(self, text: str):
@@ -79,7 +74,7 @@ class Text(Frame):
 	def _draw_self(self):
 		if self._text_surface is not None:
 			# TODO: Make much more efficient please
-			texture = sdl_video.Texture.from_surface(self._renderer, self._text_surface)
+			texture = Texture.from_surface(self._renderer, self._text_surface)
 			texture.draw(dstrect=(self._draw_pos, self._text_surface.size))
 
 
@@ -210,15 +205,11 @@ class Button(Frame):
 
 	def _draw_overlay(self):
 		if self._hovered or self._clicked:
-			prev_blend_mode = self._renderer.draw_blend_mode
-			self._renderer.draw_blend_mode = pygame.BLENDMODE_ADD
-
-			prev_draw_color = self._renderer.draw_color
-			self._renderer.draw_color = (20, 20, 20)
-			self._renderer.fill_rect((self._draw_pos, self.size))
-			self._renderer.draw_color = prev_draw_color
-
-			self._renderer.draw_blend_mode = prev_blend_mode
+			with (
+				self._renderer.using_blend_mode(pygame.BLENDMODE_ADD),
+				self._renderer.using_draw_color((20, 20, 20)),
+			):
+				self._renderer.fill_rect((self._draw_pos, self.size))
 
 
 class TextSelector(Frame):
@@ -326,7 +317,5 @@ class ProgressBar(Frame):
 			self.size.y - self.padding.top - self.padding.bottom,
 		)
 
-		prev_draw_color = self._renderer.draw_color
-		self._renderer.draw_color = self._color
-		self._renderer.fill_rect(fill_rect)
-		self._renderer.draw_color = prev_draw_color
+		with self._renderer.using_draw_color(self._color):
+			self._renderer.fill_rect(fill_rect)

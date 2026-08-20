@@ -1,6 +1,7 @@
 import logging
 
 import pygame.typing
+from pygame._sdl2.video import Texture
 
 from . import utils
 from .app import App
@@ -15,6 +16,7 @@ from .graphics.sprite_sheet import SpriteSheet
 from .inputs import *
 from .lighting import *
 from .particles import *
+from .renderer import Renderer
 from .resources import Resources, ResourceType
 from .timer import Timer
 from .transition_states import FadeTransition
@@ -26,14 +28,17 @@ __all__ = [
 	"Camera",
 	"CameraController",
 	"CubicTween",
+	"Debug",
 	"DialogueManager",
 	"DialogueNode",
 	"DialogueOption",
 	"FadeTransition",
 	"GameState",
 	"LinearTween",
+	"Renderer",
 	"ResourceType",
 	"Resources",
+	"Texture",
 	"Timer",
 	"utils",
 ]

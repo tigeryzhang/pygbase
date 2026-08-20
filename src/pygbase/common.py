@@ -4,6 +4,8 @@ from typing import Any
 
 import pygame.typing
 
+from .renderer import Renderer
+
 logger = logging.getLogger(__name__)
 
 
@@ -19,6 +21,8 @@ class ParticleOptions(enum.Enum):
 
 
 class Common:
+	renderer: Renderer
+
 	_values: dict[str, Any] = {}
 
 	_game_states: dict[str, int] = {"all": 0}

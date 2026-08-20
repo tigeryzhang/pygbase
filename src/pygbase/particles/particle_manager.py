@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
 import pygame
-import pygame._sdl2.video as sdl_video
 
 from pygbase.common import Common
 
@@ -28,7 +27,7 @@ class ParticleManager:
 		self.generate_chunked_colliders(colliders)
 		self.dynamic_colliders: list[pygame.Rect] = []
 
-		self.renderer: sdl_video.Renderer = Common.get("renderer")
+		self.renderer = Common.renderer
 
 	def generate_chunked_colliders(self, colliders):
 		chunked_colliders = {}
@@ -150,9 +149,9 @@ class ParticleManager:
 			particle.has_moved_chunk = False
 
 	def draw(self, camera: Camera):
+		prev_draw_color = self.renderer.draw_color
 		for chunk in self.particles.values():
 			for particle in chunk:
-				prev_draw_color = self.renderer.draw_color
 				self.renderer.draw_color = particle.color
 				self.renderer.fill_rect(
 					(
@@ -160,7 +159,7 @@ class ParticleManager:
 						(particle.size, particle.size),
 					)
 				)
-				self.renderer.draw_color = prev_draw_color
+		self.renderer.draw_color = prev_draw_color
 
 		# Debug
 		if Debug.is_active():

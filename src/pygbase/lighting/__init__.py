@@ -1,6 +1,6 @@
 import pygame
-import pygame._sdl2.video as sdl_video
 
+from .. import Texture
 from ..common import Common
 from .light import Light
 from .lighting_manager import LightingManager
@@ -18,8 +18,8 @@ def init_lighting_system():
 def generate_lights(radius: int, power: float = 1.4):
 	resolution = radius * 2
 
-	light_texture = sdl_video.Texture(
-		Common.get("renderer"),
+	light_texture = Texture(
+		Common.renderer,
 		(
 			resolution,
 			resolution,
@@ -46,8 +46,8 @@ def generate_lights(radius: int, power: float = 1.4):
 def generate_shadows(radius: int, power: float = 3):
 	resolution = radius * 2
 
-	shadow_texture = sdl_video.Texture(
-		Common.get("renderer"),
+	shadow_texture = Texture(
+		Common.renderer,
 		(
 			resolution,
 			resolution,

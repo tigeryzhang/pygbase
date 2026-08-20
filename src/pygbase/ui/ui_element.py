@@ -5,10 +5,11 @@ from types import TracebackType
 from typing import Self
 
 import pygame
-import pygame._sdl2.video as sdl_video
 
-from .. import Common, Input
+from .. import Texture
+from ..common import Common
 from ..debug import Debug
+from ..inputs import Input
 from .values import (
 	EPSILON,
 	Fit,
@@ -93,8 +94,8 @@ class Frame:
 			self.parent.children.append(self)  # NoQA: Dunno why pycharm thinks this is wrong
 
 		# Surface
-		self._renderer: sdl_video.Renderer = Common.get("renderer")
-		self._texture: sdl_video.Texture | None = None
+		self._renderer = Common.renderer
+		self._texture: Texture | None = None
 
 		# UI actions
 		self._time: float = 0  # TODO: Use multiple times for different actions?
@@ -749,15 +750,11 @@ class Frame:
 
 	def draw(self):
 		if self.background_color is not None:
-			prev_blend_mode = self._renderer.draw_blend_mode
-			self._renderer.draw_blend_mode = pygame.BLENDMODE_BLEND
-
-			prev_draw_color = self._renderer.draw_color
-			self._renderer.draw_color = self.background_color
-			self._renderer.fill_rect((self._draw_pos, (self.width, self.height)))
-			self._renderer.draw_color = prev_draw_color
-
-			self._renderer.draw_blend_mode = prev_blend_mode
+			with (
+				self._renderer.using_blend_mode(pygame.BLENDMODE_BLEND),
+				self._renderer.using_draw_color(self.background_color),
+			):
+				self._renderer.fill_rect((self._draw_pos, (self.width, self.height)))
 
 		self._draw_self()
 

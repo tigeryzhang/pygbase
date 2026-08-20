@@ -1,10 +1,10 @@
 import enum
 
 import pygame
-import pygame._sdl2.video as sdl_video
 
 from pygbase.common import Common
 
+from .. import Texture
 from ..debug import Debug
 
 
@@ -108,9 +108,9 @@ class RawText:
 		self.overflow_behaviour = overflow_behaviour
 		self.max_width = max_width
 
-		self.renderer: sdl_video.Renderer = Common.get("renderer")
+		self.renderer = Common.renderer
 		self.rendered_text_surface: pygame.Surface
-		self.rendered_text_texture: sdl_video.Texture | None
+		self.rendered_text_texture: Texture | None
 		self.text_rect: pygame.Rect
 		self._render_text()
 
@@ -136,7 +136,7 @@ class RawText:
 				self.rendered_text_surface = pygame.transform.smoothscale_by(self.rendered_text_surface, ratio)
 
 		if self.rendered_text_surface.width != 0 and self.rendered_text_surface.height != 0:
-			self.rendered_text_texture = sdl_video.Texture.from_surface(
+			self.rendered_text_texture = Texture.from_surface(
 				self.renderer,
 				self.rendered_text_surface,
 			)

@@ -1,8 +1,8 @@
 import pygame
-import pygame._sdl2.video as sdl_video
 
 from pygbase.common import Common
 
+from .. import Texture
 from ..camera import Camera
 from .light import Light
 from .shadow import Shadow
@@ -10,18 +10,18 @@ from .shadow import Shadow
 
 class LightingManager:
 	def __init__(self, default_brightness: float, shadow_brightness: float):
-		self.renderer: sdl_video.Renderer = Common.get("renderer")
+		self.renderer = Common.renderer
 
 		self.brightness = default_brightness
 		self.shadow_brightness = shadow_brightness
 
-		self.light_texture = sdl_video.Texture(self.renderer, Common.get("screen_size"), target=True)
+		self.light_texture = Texture(self.renderer, Common.get("screen_size"), target=True)
 		self.light_texture.blend_mode = pygame.BLENDMODE_MUL
 
-		self.add_light_texture = sdl_video.Texture(self.renderer, Common.get("screen_size"), target=True)
+		self.add_light_texture = Texture(self.renderer, Common.get("screen_size"), target=True)
 		self.add_light_texture.blend_mode = pygame.BLENDMODE_ADD
 
-		self.shadow_texture = sdl_video.Texture(self.renderer, Common.get("screen_size"), target=True)
+		self.shadow_texture = Texture(self.renderer, Common.get("screen_size"), target=True)
 		self.shadow_texture.blend_mode = pygame.BLENDMODE_MUL
 
 		self.lights: list[Light] = []
@@ -49,46 +49,30 @@ class LightingManager:
 			light.update(delta)
 
 	def draw_shadows(self, camera: Camera | None = None):
-		prev_target = self.renderer.target
-		self.renderer.target = self.shadow_texture
+		with self.renderer.using_target(self.shadow_texture):
+			self.renderer.clear_with_color((255, 255, 255))
 
-		prev_draw_color = self.renderer.draw_color
-		self.renderer.draw_color = (255,255,255)
-		self.renderer.clear()
-		self.renderer.draw_color = prev_draw_color
-
-		# TODO: Make sure this actually works?
-		Shadow.shadow_texture.alpha = int(self.shadow_brightness * 255)
-		for shadow in self.shadows:
-			shadow.draw(camera)
-
-		self.renderer.target = prev_target
+			Shadow.shadow_texture.alpha = int(self.shadow_brightness * 255)
+			for shadow in self.shadows:
+				shadow.draw(camera)
 
 		self.shadow_texture.draw()
 
 	def draw_lights(self, camera: Camera | None = None):
-		prev_target = self.renderer.target
-		prev_draw_color = self.renderer.draw_color
-
 		# Multiplicative lighting
-		self.renderer.target = self.light_texture
-		brightness = int(self.brightness * 255)
-		self.renderer.draw_color = (brightness, brightness, brightness)
-		self.renderer.clear()
+		with self.renderer.using_target(self.light_texture):
+			brightness = int(self.brightness * 255)
+			self.renderer.clear_with_color((brightness, brightness, brightness))
 
-		for light in self.lights:
-			light.draw_light(camera)
+			for light in self.lights:
+				light.draw_light(camera)
 
 		# Add lighting
-		self.renderer.target = self.add_light_texture
-		self.renderer.draw_color = (0, 0, 0)
-		self.renderer.clear()
+		with self.renderer.using_target(self.add_light_texture):
+			self.renderer.clear_with_color((0, 0, 0))
 
-		for light in self.lights:
-			light.draw_add_light(camera)
-
-		self.renderer.draw_color = prev_draw_color
-		self.renderer.target = prev_target
+			for light in self.lights:
+				light.draw_add_light(camera)
 
 		self.light_texture.draw()
 		self.add_light_texture.draw()

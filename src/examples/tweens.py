@@ -1,5 +1,3 @@
-import pygame._sdl2.video as sdl_video
-
 import pygbase
 from pygbase.common import Common
 from pygbase.ui import *
@@ -8,7 +6,7 @@ from pygbase.ui import *
 class Tweens(pygbase.GameState, name="tweens"):
 	def __init__(self):
 		super().__init__(clear_color=(20, 20, 20))
-		self.renderer: sdl_video.Renderer = Common.get("renderer")
+		self.renderer = Common.renderer
 
 		from .menu import Menu
 
