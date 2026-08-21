@@ -25,7 +25,7 @@ class Common:
 
 	_values: dict[str, Any] = {}
 
-	_game_states: dict[str, int] = {"all": 0}
+	_scenes: dict[str, int] = {"all": 0}
 
 	_resource_types: dict[str, int] = {}
 
@@ -56,17 +56,17 @@ class Common:
 			del cls._values[name]
 
 	@classmethod
-	def add_game_state(cls, name: str, game_state_id: int):
-		if name not in cls._game_states:
-			cls._game_states[name] = game_state_id
+	def add_scene(cls, name: str, scene_id: int):
+		if name not in cls._scenes:
+			cls._scenes[name] = scene_id
 		else:
-			logger.error(f"Game state name: `{name}` already taken")
+			logger.error(f"Scene name: `{name}` already taken")
 			raise KeyError(f"Game state name: `{name}` does not exist")
 
 	@classmethod
-	def get_game_state_id(cls, name: str):
-		if name in cls._game_states:
-			return cls._game_states[name]
+	def get_scene_id(cls, name: str):
+		if name in cls._scenes:
+			return cls._scenes[name]
 		else:
 			logger.error(f"Game state name: `{name}` does not exist")
 			raise KeyError(f"Game state name: `{name}` does not exist")

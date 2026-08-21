@@ -11,7 +11,7 @@ class Events:
 
 	@classmethod
 	def init(cls):
-		cls._handlers[Common.get_game_state_id("all")] = {}
+		cls._handlers[Common.get_scene_id("all")] = {}
 
 	@classmethod
 	def create_custom_event(cls, name: str):
@@ -36,17 +36,17 @@ class Events:
 		event: int | str,
 		handler: Callable[[pygame.event.Event], None],
 	):
-		game_state_id = Common.get_game_state_id(state_name)
+		scene_id = Common.get_scene_id(state_name)
 
-		if game_state_id not in cls._handlers:
-			cls._handlers[game_state_id] = {}
+		if scene_id not in cls._handlers:
+			cls._handlers[scene_id] = {}
 
 		event_type = cls._convert_to_event_type(event)
 
-		if event_type not in cls._handlers[game_state_id]:
-			cls._handlers[game_state_id][event_type] = []
+		if event_type not in cls._handlers[scene_id]:
+			cls._handlers[scene_id][event_type] = []
 
-		cls._handlers[game_state_id][event_type].append(handler)
+		cls._handlers[scene_id][event_type].append(handler)
 
 	@classmethod
 	def remove_handler(
@@ -56,17 +56,17 @@ class Events:
 		event: int | str | None = None,
 	):
 		if state_name is not None:
-			game_state_id = Common.get_game_state_id(state_name)
+			scene_id = Common.get_scene_id(state_name)
 
 			if event is not None:
-				cls._handlers[game_state_id][cls._convert_to_event_type(event)].remove(handler)
+				cls._handlers[scene_id][cls._convert_to_event_type(event)].remove(handler)
 			else:
 				# event_type -> handlers
-				for handlers in cls._handlers[game_state_id].values():
+				for handlers in cls._handlers[scene_id].values():
 					if handler in handlers:
 						handlers.remove(handler)
 		else:
-			# game_state_id -> events
+			# scene_id -> events
 			for events in cls._handlers.values():
 				# event_type -> handlers
 				for handlers in events.values():
@@ -74,15 +74,15 @@ class Events:
 						handlers.remove(handler)
 
 	@classmethod
-	def handle_events(cls, current_game_state: int):
+	def handle_events(cls, current_scene: int):
 		"""
 		Used by the app
 		"""
 
 		for event in pygame.event.get():
-			if current_game_state in cls._handlers:
-				if event.type in cls._handlers[current_game_state]:
-					for handler in cls._handlers[current_game_state][event.type]:
+			if current_scene in cls._handlers:
+				if event.type in cls._handlers[current_scene]:
+					for handler in cls._handlers[current_scene][event.type]:
 						handler(event)
 
 			if event.type in cls._handlers[0]:
@@ -92,9 +92,9 @@ class Events:
 	# TODO: Determine if this is needed
 	@classmethod
 	def run_handlers(cls, state_name: str, event_type: int, **kwargs):
-		game_state_id = Common.get_game_state_id(state_name)
+		scene_id = Common.get_scene_id(state_name)
 
-		for handler in cls._handlers[game_state_id][event_type]:
+		for handler in cls._handlers[scene_id][event_type]:
 			handler(pygame.event.Event(event_type, kwargs))
 
 	@classmethod

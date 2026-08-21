@@ -9,10 +9,10 @@ import pygbase
 from .common import Common
 from .debug import Debug
 from .events import Events
-from .game_state import GameState
 from .inputs.input import Input
 from .loader import Loading
 from .renderer import Renderer
+from .scene import Scene
 
 logger = logging.getLogger(__name__)
 
@@ -20,19 +20,18 @@ logger = logging.getLogger(__name__)
 class App:
 	def __init__(
 		self,
-		after_load_state: type[GameState],
+		after_load_state: type[Scene],
 		title: str = "Pygbase Window",
 		fixed_time_fps: int = 60,
+		vsync: bool = True,
 		run_on_load_complete: tuple[Callable, ...] = (),
 	):
 		self.is_running: bool = True
 
 		self.title = title
 
-		# TODO: add flag handling?
-		# ^ This is dependent partly on pygame though :/
 		self.window = pygame.Window(title, Common.get("screen_size"))
-		self.renderer = Renderer(self.window, vsync=False, target_texture=True)
+		self.renderer = Renderer(self.window, vsync=vsync, target_texture=True)
 		Common.renderer = self.renderer
 
 		Debug.init()
@@ -40,7 +39,7 @@ class App:
 		self.clock: pygame.time.Clock = pygame.time.Clock()
 
 		load_complete_runners = (pygbase.lighting.init_lighting_system,) + run_on_load_complete
-		self.game_state: Loading | GameState = Loading(after_load_state, load_complete_runners)
+		self.scene: Loading | Scene = Loading(after_load_state, load_complete_runners)
 
 		self.fixed_time_rate = 1 / fixed_time_fps
 
@@ -51,27 +50,28 @@ class App:
 
 	def handle_events(self):
 		Input.reset()
-		Events.handle_events(self.game_state.id)
+		Events.handle_events(self.scene.id)
 
 	def update(self, delta):
-		self.game_state.update(delta)
+		self.scene.update(delta)
 
 	def fixed_update(self):
-		self.game_state.fixed_update(self.fixed_time_rate)
+		self.scene.fixed_update(self.fixed_time_rate)
 
 	def draw(self):
-		self.renderer.clear_with_color(self.game_state.clear_color)
-		self.game_state.draw()
+		if self.scene.clear_color is not None:
+			self.renderer.clear_with_color(self.scene.clear_color)
+		self.scene.draw()
 
 	def switch_state(self):
-		next_state = self.game_state.get_next_state()
-		if self.game_state is not next_state:
-			self.game_state.exit()
+		next_state = self.scene.get_next_state()
+		if self.scene is not next_state:
+			self.scene.exit()
 
-			self.game_state = self.game_state.get_next_state()
-			self.game_state.enter()
+			self.scene = self.scene.get_next_state()
+			self.scene.enter()
 
-			logger.debug("Switching states, running garbage collector...")
+			logger.debug("Switching scene, running garbage collector...")
 			gc.collect()
 
 	def run(self):

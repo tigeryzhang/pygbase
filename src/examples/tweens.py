@@ -3,7 +3,7 @@ from pygbase.common import Common
 from pygbase.ui import *
 
 
-class Tweens(pygbase.GameState, name="tweens"):
+class Tweens(pygbase.Scene, name="tweens"):
 	def __init__(self):
 		super().__init__(clear_color=(20, 20, 20))
 		self.renderer = Common.renderer

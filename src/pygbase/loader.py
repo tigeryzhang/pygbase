@@ -1,19 +1,16 @@
 from collections.abc import Callable
 
-from .game_state import GameState
 from .resources import Resources
+from .scene import Scene
 
 
-class Loading(GameState, name="loading"):
+class Loading(Scene, name="loading"):
 	def __init__(
 		self,
-		after_load_state: type[GameState],
+		after_load_state: type[Scene],
 		run_on_load_complete: tuple[Callable, ...],
 	):
-		# From GameState, but no parent __init__ call, so have to do it manually
-		self.id = -1
-		self._next_state = self
-		self.clear_color = (0, 0, 0)
+		super().__init__(clear_color=(0, 0, 0))
 
 		Resources.init_load()
 

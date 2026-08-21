@@ -3,7 +3,7 @@ import pygame
 from .common import Common
 
 
-class GameState:
+class Scene:
 	child_state_id = 1
 
 	def __init_subclass__(cls, **kwargs):
@@ -14,17 +14,13 @@ class GameState:
 
 		name = kwargs["name"]
 
-		# Disregard built in game_states
-		if name == "loading" or name == "transition" or name == "fade_transition":
-			return
-
 		# Add id to common and child class, then increment by 1
-		Common.add_game_state(name, GameState.child_state_id)
-		cls.id = GameState.child_state_id
+		Common.add_scene(name, Scene.child_state_id)
+		cls.id = Scene.child_state_id
 
-		GameState.child_state_id += 1
+		Scene.child_state_id += 1
 
-	def __init__(self, clear_color: pygame.typing.ColorLike = (0, 0, 0)):
+	def __init__(self, clear_color: pygame.typing.ColorLike | None = (0, 0, 0)):
 		self._next_state = self
 		self.clear_color = clear_color
 
@@ -34,16 +30,16 @@ class GameState:
 	def exit(self):
 		"""Called when exiting state"""
 
-	def set_next_state(self, next_state: GameState):
+	def set_next_state(self, next_state: Scene):
 		self._next_state = next_state
 
-	def set_next_state_type(self, next_state: type[GameState], args: tuple):
+	def set_next_state_type(self, next_state: type[Scene], args: tuple):
 		if len(args) > 0:
 			self._next_state = next_state(*args)
 		else:
 			self._next_state = next_state()
 
-	def get_next_state(self) -> GameState:
+	def get_next_state(self) -> Scene:
 		return self._next_state
 
 	def update(self, delta: float):

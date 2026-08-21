@@ -3,7 +3,7 @@ import pygame
 import pygbase
 
 
-class DialogueTesting(pygbase.GameState, name="dialogue"):
+class DialogueTesting(pygbase.Scene, name="dialogue"):
 	def __init__(self):
 		super().__init__()
 

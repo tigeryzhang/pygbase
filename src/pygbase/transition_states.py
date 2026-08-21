@@ -2,13 +2,12 @@ import pygame
 
 from . import Texture
 from .common import Common
-from .game_state import GameState
+from .scene import Scene
 
 
-class Transition(GameState, name="transition"):
-	def __init__(self, current_state: GameState, to_state: GameState):
-		self.id = -2
-		self._next_state = self
+class Transition(Scene, name="transition"):
+	def __init__(self, current_state: Scene, to_state: Scene):
+		super().__init__(clear_color=None)
 
 		self.current_state = current_state
 		self.to_state = to_state
@@ -20,8 +19,8 @@ class Transition(GameState, name="transition"):
 class FadeTransition(Transition, name="fade_transition"):
 	def __init__(
 		self,
-		current_state: GameState,
-		to_state: GameState,
+		current_state: Scene,
+		to_state: Scene,
 		transition_time: float,
 		fade_colour: tuple[int, int, int],
 	):

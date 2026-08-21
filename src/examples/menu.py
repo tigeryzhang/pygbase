@@ -4,7 +4,7 @@ import pygbase
 from pygbase.ui import *
 
 
-class Menu(pygbase.GameState, name="menu"):
+class Menu(pygbase.Scene, name="menu"):
 	def __init__(self):
 		super().__init__(clear_color=(20, 20, 20))
 

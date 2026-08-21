@@ -9,7 +9,6 @@ from .camera import Camera, CameraController
 from .common import Common
 from .debug import Debug
 from .events import Events
-from .game_state import GameState
 from .graphics import *
 from .graphics.image import Image
 from .graphics.sprite_sheet import SpriteSheet
@@ -18,6 +17,7 @@ from .lighting import *
 from .particles import *
 from .renderer import Renderer
 from .resources import Resources, ResourceType
+from .scene import Scene
 from .timer import Timer
 from .transition_states import FadeTransition
 from .tweens import CubicTween, LinearTween
@@ -33,11 +33,11 @@ __all__ = [
 	"DialogueNode",
 	"DialogueOption",
 	"FadeTransition",
-	"GameState",
 	"LinearTween",
 	"Renderer",
 	"ResourceType",
 	"Resources",
+	"Scene",
 	"Texture",
 	"Timer",
 	"utils",
