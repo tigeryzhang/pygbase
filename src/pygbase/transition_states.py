@@ -5,7 +5,7 @@ from .common import Common
 from .scene import Scene
 
 
-class Transition(Scene, name="transition"):
+class Transition(Scene, name="_transition"):
 	def __init__(self, current_state: Scene, to_state: Scene):
 		super().__init__(clear_color=None)
 

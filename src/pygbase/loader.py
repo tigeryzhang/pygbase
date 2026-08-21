@@ -4,7 +4,7 @@ from .resources import Resources
 from .scene import Scene
 
 
-class Loading(Scene, name="loading"):
+class Loading(Scene, name="_loading"):
 	def __init__(
 		self,
 		after_load_state: type[Scene],
